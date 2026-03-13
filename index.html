@@ -1,0 +1,3635 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mentaler Prozess -- Eingabemaske</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+:root {
+  --primary: #003770;
+  --primary-light: #13679A;
+  --accent: #1D9DD9;
+  --accent-light: #4AB1E1;
+  --accent-lighter: #61BAE4;
+  --bg: #f5f7fa;
+  --card: #ffffff;
+  --border: #dcdde1;
+  --text: #393E40;
+  --text-light: #716F6E;
+  --success: #1D9DD9;
+  --warning: #f39c12;
+  --danger: #e74c3c;
+  --radius: 8px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Montserrat', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, #003770 0%, #13679A 100%);
+  color: white;
+  padding: 4px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+.header h1 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin: 0;
+  padding: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.header-actions button {
+  padding: 8px 16px;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.1);
+  color: white;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.header-actions button:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+/* Layout */
+.container {
+  display: flex;
+  min-height: calc(100vh - 70px);
+}
+
+/* Sidebar Navigation */
+.sidebar {
+  width: 280px;
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  padding: 20px 0;
+  position: sticky;
+  top: 70px;
+  height: calc(100vh - 70px);
+  overflow-y: auto;
+}
+
+.nav-item {
+  padding: 12px 24px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  border-left: 3px solid transparent;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-item:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.nav-item.active {
+  background: #e6f2fa;
+  color: var(--accent);
+  border-left-color: var(--accent);
+  font-weight: 600;
+}
+
+.nav-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--text-light);
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.nav-item.active .nav-number {
+  background: var(--accent);
+  color: white;
+}
+
+/* Main Content */
+.main {
+  flex: 1;
+  padding: 30px 40px;
+  max-width: 900px;
+}
+
+/* Section */
+.section {
+  display: none;
+}
+
+.section.active {
+  display: block;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--primary);
+}
+
+.section-subtitle {
+  color: var(--text-light);
+  margin-bottom: 30px;
+  font-size: 0.95rem;
+}
+
+/* Cards */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+}
+
+.card-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--primary);
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--bg);
+}
+
+/* Form Elements */
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.form-group .hint {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-light);
+  margin-bottom: 6px;
+  font-weight: 400;
+}
+
+input[type="text"],
+input[type="date"],
+input[type="email"],
+input[type="tel"],
+textarea,
+select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.92rem;
+  font-family: inherit;
+  color: var(--text);
+  transition: border-color 0.2s;
+  background: white;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Radio Groups for Antreibertest */
+.radio-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: 10px;
+  transition: background 0.2s;
+}
+
+.radio-row:hover {
+  background: var(--bg);
+}
+
+.radio-row .question-num {
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 28px;
+}
+
+.radio-row .question-text {
+  flex: 1;
+  font-size: 0.92rem;
+}
+
+.radio-options {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: var(--text-light);
+}
+
+.radio-option input[type="radio"] {
+  width: auto;
+  cursor: pointer;
+}
+
+/* VAKOG Matrix */
+.vakog-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.vakog-table th {
+  background: var(--primary);
+  color: white;
+  padding: 10px 8px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+.vakog-table th:first-child {
+  text-align: left;
+  width: 30px;
+}
+
+.vakog-table th:nth-child(2) {
+  text-align: left;
+  width: 140px;
+}
+
+.vakog-table td {
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+
+.vakog-table td:first-child {
+  text-align: center;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.vakog-table td:nth-child(2) {
+  text-align: left;
+  font-weight: 500;
+}
+
+.vakog-table tr:hover {
+  background: #f8f9fa;
+}
+
+.vakog-table input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* Antreibertest Ergebnis */
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.result-card {
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+  border: 2px solid transparent;
+  transition: all 0.3s;
+}
+
+.result-card.highlight {
+  border-color: var(--accent);
+  background: #e6f2fa;
+}
+
+.result-card .score {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.antreiber-interpretation {
+  display: none;
+  margin-top: 24px;
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.antreiber-interpretation.visible { display: block; }
+
+.antreiber-interpretation .interp-header {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  padding: 14px 20px;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.antreiber-interpretation .interp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+.antreiber-interpretation .interp-cell {
+  padding: 14px 18px;
+  border-bottom: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
+}
+
+.antreiber-interpretation .interp-cell:nth-child(even) { border-right: none; }
+
+.antreiber-interpretation .interp-label {
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.antreiber-interpretation .interp-text {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.antreiber-interpretation .interp-motto {
+  padding: 14px 20px;
+  background: #f0f7fc;
+  font-style: italic;
+  color: var(--primary);
+  font-size: 0.92rem;
+  text-align: center;
+  border-top: 1px solid #e0e0e0;
+}
+
+.result-card .label {
+  font-size: 0.78rem;
+  color: var(--text-light);
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.result-card .max {
+  font-size: 0.72rem;
+  color: var(--border);
+}
+
+/* Dynamic List */
+.dynamic-list .list-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.dynamic-list .list-item input,
+.dynamic-list .list-item textarea {
+  flex: 1;
+}
+
+.btn-remove {
+  padding: 8px 12px;
+  background: var(--danger);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.btn-add {
+  padding: 8px 16px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+
+.btn-add:hover { background: var(--primary-light); }
+.btn-remove:hover { background: #c0392b; }
+
+/* Navigation Buttons */
+.nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.btn {
+  padding: 12px 28px;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--primary-light);
+}
+
+.btn-secondary {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--border);
+}
+
+/* Huna Principle */
+.huna-card {
+  border-left: 4px solid var(--accent);
+  margin-bottom: 16px;
+}
+
+.huna-card .huna-name {
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 0.95rem;
+}
+
+.huna-card .huna-meaning {
+  color: var(--text-light);
+  font-size: 0.88rem;
+  margin-bottom: 10px;
+}
+
+/* Byron Katie Frage */
+.byron-question {
+  background: var(--bg);
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--primary);
+}
+
+/* Gedanken Paare */
+.thought-pair {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 12px;
+  align-items: start;
+  margin-bottom: 12px;
+}
+
+.thought-pair .arrow {
+  display: flex;
+  align-items: center;
+  padding-top: 32px;
+  font-size: 1.4rem;
+  color: var(--accent);
+}
+
+/* Print */
+/* Print Overview - hidden on screen */
+.print-only { display: none; }
+
+@media print {
+  @page { size: A4 landscape; margin: 6mm; }
+
+  .header, .sidebar, .nav-buttons, .header-actions, .btn-add, .btn-remove,
+  .anno-edit-btn, .anno-add-btn, .ft-trigger, .ft-overlay,
+  .annotations-panel, .container,
+  .mobile-nav-btn, .mobile-nav-overlay, .mobile-anno-btn { display: none !important; }
+
+  .print-only { display: block !important; }
+
+  body { font-size: 6pt; margin: 0; padding: 0; color: #333; }
+
+  #print-overview {
+    width: 100%;
+  }
+
+  .po-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px 6px;
+    border-bottom: 2px solid #003770;
+    margin-bottom: 2px;
+  }
+  .po-title { font-size: 9pt; font-weight: 700; color: #003770; }
+  .po-client { font-size: 8pt; font-weight: 600; color: #13679A; }
+
+  .po-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr 1fr;
+    grid-template-rows: auto auto auto auto;
+    gap: 2px;
+  }
+
+  .po-cell {
+    border: 1px solid #999;
+    padding: 2px 4px;
+    overflow: visible;
+    font-size: 5.5pt;
+    line-height: 1.2;
+  }
+
+  .po-cell-title {
+    font-weight: 700;
+    font-size: 6pt;
+    color: #003770;
+    margin-bottom: 1px;
+  }
+  .po-cell-title.po-big { font-size: 7pt; text-align: center; }
+  .po-cell-title.po-name { font-size: 8pt; text-align: center; }
+
+  .po-small { font-size: 5pt; color: #666; line-height: 1.15; margin-bottom: 1px; }
+  .po-sub { padding-top: 2px; }
+
+  .po-cell-content { font-size: 5.5pt; }
+  .po-ziel-text { font-size: 7pt; text-align: center; padding: 4px 2px; color: #003770; font-weight: 600; }
+
+  .po-val { display: flex; justify-content: space-between; padding: 0; }
+  .po-val-label { color: #555; }
+  .po-val-score { font-weight: 700; color: #003770; }
+  .po-val-highlight { background: #fff3cd; padding: 0 4px; }
+
+  .po-gedanke { padding: 0; border-bottom: 1px dotted #ddd; }
+
+  .po-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; padding: 0; border-bottom: 1px dotted #ddd; }
+  .po-pair-left { color: #999; }
+  .po-pair-right { color: #003770; font-weight: 600; }
+
+  .po-footer {
+    text-align: center;
+    font-size: 5pt;
+    color: #999;
+    padding-top: 1px;
+    border-top: 1px solid #ccc;
+  }
+}
+
+/* Annotations Panel */
+.annotations-panel {
+  width: 320px;
+  background: #fefdf6;
+  border-left: 1px solid #e8e4d4;
+  padding: 20px;
+  position: sticky;
+  top: 70px;
+  height: calc(100vh - 70px);
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.annotations-panel .anno-header {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #8b7e56;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e8e4d4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.annotations-panel .anno-header:hover {
+  color: #6b5e3e;
+}
+
+.annotations-panel .anno-header .panel-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background: #e8e4d4;
+  color: #6b5e3e;
+  font-weight: 800;
+  font-size: 1rem;
+  flex-shrink: 0;
+  line-height: 1;
+  font-family: monospace;
+}
+
+.annotations-panel .anno-content.panel-collapsed {
+  display: none;
+}
+
+.anno-section {
+  display: none;
+}
+
+.anno-section.active {
+  display: block;
+}
+
+.anno-note {
+  background: white;
+  border: 1px solid #e8e4d4;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: #5a5340;
+  overflow: hidden;
+}
+
+.anno-note .anno-title-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #faf6e8;
+  cursor: pointer;
+  border-bottom: 1px solid #e8e4d4;
+}
+
+.anno-note .anno-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: #e8e4d4;
+  border-radius: 4px;
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #6b5e3e;
+  flex-shrink: 0;
+}
+
+.anno-note .anno-title {
+  font-weight: 700;
+  color: #6b5e3e;
+  font-size: 0.82rem;
+}
+
+.anno-note .anno-body {
+  padding: 12px 14px;
+}
+
+.anno-note .anno-text {
+  white-space: pre-line;
+  margin-bottom: 0;
+}
+
+.anno-note .anno-edit-btn {
+  margin-top: 8px;
+  display: inline-block;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: #b0a580;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+.anno-note .anno-edit-btn:hover {
+  background: #f0ead6;
+  color: #6b5e3e;
+}
+
+.anno-note textarea {
+  width: 100%;
+  min-height: 60px;
+  font-size: 0.84rem;
+  font-family: inherit;
+  border: 1px solid #d4cdb3;
+  border-radius: 4px;
+  padding: 8px;
+  resize: vertical;
+  background: #fffef8;
+  color: #5a5340;
+}
+
+.anno-note textarea:focus {
+  outline: none;
+  border-color: #b0a580;
+}
+
+.anno-note.collapsed .anno-body {
+  display: none;
+}
+
+.anno-note.collapsed .anno-title-bar {
+  border-bottom: none;
+}
+
+.anno-add-btn {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  background: transparent;
+  border: 1px dashed #d4cdb3;
+  border-radius: 6px;
+  color: #b0a580;
+  font-size: 0.82rem;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.anno-add-btn:hover {
+  background: #f7f3e6;
+  border-color: #b0a580;
+  color: #6b5e3e;
+}
+
+/* Fragetechnik Floating Button */
+.ft-trigger {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 200;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 14px 22px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.ft-trigger:hover {
+  background: #13679A;
+  transform: translateY(-2px);
+}
+
+.ft-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 300;
+  background: rgba(0,0,0,0.4);
+}
+
+.ft-overlay.open {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ft-panel {
+  background: white;
+  width: 90%;
+  max-width: 1100px;
+  max-height: 85vh;
+  border-radius: 12px;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.ft-panel-header {
+  position: sticky;
+  top: 0;
+  background: var(--primary);
+  color: white;
+  padding: 20px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1;
+}
+
+.ft-panel-header h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.ft-close {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+.ft-close:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.ft-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 24px 28px;
+}
+
+.ft-card {
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 18px;
+  border: 1px solid var(--border);
+}
+
+.ft-card h3 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--border);
+}
+
+.ft-card p, .ft-card li {
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.ft-card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.ft-card ul li {
+  padding: 4px 0 4px 12px;
+  position: relative;
+}
+
+.ft-card ul li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 11px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .annotations-panel { width: 260px; padding: 14px; }
+}
+
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .annotations-panel {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100% !important;
+    height: 100vh !important;
+    z-index: 250;
+    background: #fefdf6;
+    padding: 20px;
+    overflow-y: auto;
+  }
+  .annotations-panel.mobile-open {
+    display: block !important;
+  }
+  .main { padding: 16px; padding-bottom: 80px; }
+  .form-row { grid-template-columns: 1fr; }
+  .result-grid { grid-template-columns: repeat(3, 1fr); }
+  .thought-pair { grid-template-columns: 1fr; }
+  .thought-pair .arrow { display: none; }
+  .ft-trigger {
+    bottom: 16px;
+    right: 16px;
+    padding: 10px 16px;
+    font-size: 0.78rem;
+  }
+  .nav-buttons {
+    margin-bottom: 60px;
+  }
+  .ft-grid {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+  /* Header mobile: zweizeilig */
+  .header {
+    flex-wrap: wrap;
+    padding: 4px 12px;
+    gap: 4px;
+  }
+  .header h1 {
+    font-size: 0.85rem;
+    flex: 1;
+    min-width: 0;
+  }
+  .header h1 img { height: 36px !important; width: 36px !important; }
+  .header h1 span { font-size: 0.7rem !important; }
+  .header h1 small { font-size: 0.55rem !important; }
+  .header-actions {
+    width: 100%;
+    display: flex;
+    gap: 4px;
+    justify-content: space-between;
+  }
+  .header-actions button {
+    padding: 5px 6px;
+    font-size: 0.65rem;
+    flex: 1;
+    white-space: nowrap;
+  }
+}
+
+/* Mobile Navigation Drawer */
+.mobile-nav-btn {
+  display: none;
+  position: fixed;
+  top: auto;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 10px 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  font-family: inherit;
+}
+
+.mobile-nav-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 250;
+  background: rgba(0,0,0,0.5);
+}
+.mobile-nav-overlay.open {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.mobile-nav-sheet {
+  background: white;
+  width: 100%;
+  max-height: 70vh;
+  border-radius: 16px 16px 0 0;
+  overflow-y: auto;
+  padding: 16px 0 24px 0;
+}
+.mobile-nav-sheet .mobile-nav-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px 12px 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+.mobile-nav-sheet .mobile-nav-header h3 {
+  font-size: 1rem;
+  color: var(--primary);
+  font-weight: 700;
+}
+.mobile-nav-sheet .mobile-nav-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-light);
+  cursor: pointer;
+  padding: 4px 8px;
+  font-family: inherit;
+}
+.mobile-nav-sheet .mobile-nav-item {
+  padding: 12px 20px;
+  font-size: 0.9rem;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-left: 3px solid transparent;
+}
+.mobile-nav-sheet .mobile-nav-item:active {
+  background: #e6f2fa;
+}
+.mobile-nav-sheet .mobile-nav-item.active {
+  background: #e6f2fa;
+  color: var(--accent);
+  border-left-color: var(--accent);
+  font-weight: 600;
+}
+.mobile-nav-sheet .mobile-nav-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--text-light);
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.mobile-nav-sheet .mobile-nav-item.active .mobile-nav-num {
+  background: var(--accent);
+  color: white;
+}
+
+@media (max-width: 900px) {
+  .mobile-nav-btn { display: block; }
+}
+
+/* Mobile Annotations Toggle Button */
+.mobile-anno-btn {
+  display: none;
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  z-index: 200;
+  background: #8b7e56;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 10px 16px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  font-family: inherit;
+}
+.mobile-anno-btn:hover { background: #6b5e3e; }
+
+/* Mobile Annotations Close Button */
+.mobile-anno-close {
+  display: none;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  width: 100%;
+  padding: 12px;
+  background: #8b7e56;
+  color: white;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  margin-bottom: 12px;
+  border-radius: var(--radius);
+}
+
+@media (max-width: 900px) {
+  .mobile-anno-btn { display: block; }
+  .annotations-panel.mobile-open .mobile-anno-close { display: block; }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <h1 style="display:flex; align-items:center; gap:16px; margin:0; padding:0;">
+  <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iNTgwIDU1MCA5MDAgMTA1MCI+CjxwYXRoIGQ9Ik0wIDAgQzYuNiAwIDEzLjIgMCAyMCAwIEMyMCA1OC4wOCAyMCAxMTYuMTYgMjAgMTc2IEMxMy40IDE3NiA2LjggMTc2IDAgMTc2IEMtMC40OTUgOTYuMzA1IC0wLjQ5NSA5Ni4zMDUgLTEgMTUgQy02Ljk0IDMwLjUxIC0xMi44OCA0Ni4wMiAtMTkgNjIgQy0yNi40MTgyMTQxNCA4MS4zMTA5MDY2NiAtMzMuODQ2MDgwOSAxMDAuNjE3MzgyNDMgLTQxLjMyNTMxNzM4IDExOS45MDQ2MzI1NyBDLTQ0LjQwNzU0OTE0IDEyNy44NTUyMTE4MSAtNDcuNDUyMzA0ODYgMTM1LjgxNjgxNzg3IC01MC40MjU3ODEyNSAxNDMuODA4NTkzNzUgQy01Mi42ODI0MzUwNyAxNDkuODQ1NDkyMTYgLTU1LjAwMTUyNDQ4IDE1NS44NTg3NDY4NSAtNTcuMzEyNSAxNjEuODc1IEMtNTcuNzU4MDMyMjMgMTYzLjAzNjg0ODE0IC01OC4yMDM1NjQ0NSAxNjQuMTk4Njk2MjkgLTU4LjY2MjU5NzY2IDE2NS4zOTU3NTE5NSBDLTU5LjA3OTQ0ODI0IDE2Ni40Nzk0NTA2OCAtNTkuNDk2Mjk4ODMgMTY3LjU2MzE0OTQxIC01OS45MjU3ODEyNSAxNjguNjc5Njg3NSBDLTYwLjMwMTMwMTI3IDE2OS42NTY2MzU3NCAtNjAuNjc2ODIxMjkgMTcwLjYzMzU4Mzk4IC02MS4wNjM3MjA3IDE3MS42NDAxMzY3MiBDLTYyIDE3NCAtNjIgMTc0IC02MyAxNzYgQy02OS42MTc5ODM5NiAxNzQuMTc2MjU0OTQgLTc1Ljc4ODY5ODg1IDE3MS45MTY1MTQ4OCAtODIgMTY5IEMtODAuMTA2NTA0MTggMTYyLjQwMzQ4NTA3IC03Ny45NjAxMTY1OCAxNTUuOTc1MTYzOTYgLTc1LjQ4ODI4MTI1IDE0OS41NzQyMTg3NSBDLTc1LjE1NjM2Mjc2IDE0OC43MDU5Mzk0OCAtNzQuODI0NDQ0MjcgMTQ3LjgzNzY2MDIyIC03NC40ODI0Njc2NSAxNDYuOTQzMDY5NDYgQy03My40MjkxNjgwMSAxNDQuMTg5OTEzMjQgLTcyLjM3MDk3Nzk2IDE0MS40Mzg2Njg5MyAtNzEuMzEyNSAxMzguNjg3NSBDLTcwLjYyMjcxMjggMTM2Ljg4NzQ5Nzc4IC02OS45MzMyNTc2IDEzNS4wODczNjgyOSAtNjkuMjQ0MTQwNjIgMTMzLjI4NzEwOTM4IEMtNjcuODYzMzI4NTMgMTI5LjY4MDc2OTg2IC02Ni40ODAzODE5NyAxMjYuMDc1MjU4ODQgLTY1LjA5NjE5MTQxIDEyMi40NzAyMTQ4NCBDLTYzLjY3MDQ3MTc3IDExOC43NTQwOTg3NyAtNjIuMjUxMjc1NiAxMTUuMDM1NTgwNzMgLTYwLjgzNzQwMjM0IDExMS4zMTQ5NDE0MSBDLTYwLjQ4Mzk3MjYzIDExMC4zODUwMjg4NCAtNjAuMTMwNTQyOTEgMTA5LjQ1NTExNjI3IC01OS43NjY0MDMyIDEwOC40OTcwMjQ1NCBDLTU5LjEwMTI3OTYzIDEwNi43NDU4MzI1NyAtNTguNDM2ODQyMTggMTA0Ljk5NDM3OTc3IC01Ny43NzMyNjk2NSAxMDMuMjQyNTk5NDkgQy01NS44NjkzNzI0MyA5OC4yMzA2MTI3NCAtNTMuOTEyNjgxMiA5My4yNDI3MzU2MiAtNTEuOTEwOTM0NDUgODguMjY4OTk3MTkgQy01MC40NTcwMTYyNSA4NC42NDc1MTEyNCAtNDkuMDM5MDk0NzcgODEuMDEyMTg1MjEgLTQ3LjYyNSA3Ny4zNzUgQy00Ny4zMjk3MjQxMiA3Ni42MTU5MDMzMiAtNDcuMDM0NDQ4MjQgNzUuODU2ODA2NjQgLTQ2LjczMDIyNDYxIDc1LjA3NDcwNzAzIEMtNDMuNzU2MDY4MDggNjcuNDA2ODk3NjQgLTQwLjg3MTA1Mzg4IDU5LjcwNjkyMDE5IC0zOCA1MiBDLTQxLjAwODMxNDk2IDU0Ljk4MzMwMDE5IC00NC4wMTMxMDM5NCA1Ny45NzAwOTc0MSAtNDcuMDE0ODkyNTggNjAuOTU5OTYwOTQgQy00OC4wMzMxNzI5MiA2MS45NzMyNjE1MiAtNDkuMDUyMzU0NzQgNjIuOTg1NjU3MTIgLTUwLjA3MjUwOTc3IDYzLjk5NzA3MDMxIEMtNTUuMjkzMjU3OTYgNjkuMTc0MjQ4MiAtNjAuNDA1MjE3NCA3NC4zNzU0NDYyNiAtNjUuMTg3MjU1ODYgNzkuOTY2Nzk2ODggQy02OS45NDI0ODYzMSA4NS4zMDAzNDAyIC03NS4xNzUzNjM4NyA5MC4yMDgyNDQxNiAtODAuMjYxNzE4NzUgOTUuMjIyNjU2MjUgQy04NC4xMjczOTc2MyA5OS4wNTQ4NjYwNSAtODcuOTU3OTM5MjQgMTAyLjg2NDExMDg3IC05MS41IDEwNyBDLTk2LjcxNjgwMjg3IDExMy4wOTE0MDI2NCAtMTAyLjU1NDg3NzQgMTE4LjU5NjUzNDAyIC0xMDguMjYxNzE4NzUgMTI0LjIyMjY1NjI1IEMtMTEyLjEyNzM5NzYzIDEyOC4wNTQ4NjYwNSAtMTE1Ljk1NzkzOTI0IDEzMS44NjQxMTA4NyAtMTE5LjUgMTM2IEMtMTI0LjcxNjgwMjg3IDE0Mi4wOTE0MDI2NCAtMTMwLjU1NDg3NzQgMTQ3LjU5NjUzNDAyIC0xMzYuMjYxNzE4NzUgMTUzLjIyMjY1NjI1IEMtMTQwLjg3MTk5NzEgMTU3Ljc5MzAxODc3IC0xNDUuMzM4MDAyNDIgMTYyLjQwMjc0MTE4IC0xNDkuNTYxMDM1MTYgMTY3LjMzMzk4NDM4IEMtMTUxLjI2OTY3MzggMTY5LjMxMjIyNDk4IC0xNTMuMDcwNTIxODQgMTcxLjE3MTEyMzQ0IC0xNTQuOTM3NSAxNzMgQy0xNTUuNTI0MDIzNDQgMTczLjU3NzUgLTE1Ni4xMTA1NDY4NyAxNzQuMTU1IC0xNTYuNzE0ODQzNzUgMTc0Ljc1IEMtMTU3LjM1MDk5NjA5IDE3NS4zNjg3NSAtMTU3LjM1MDk5NjA5IDE3NS4zNjg3NSAtMTU4IDE3NiBDLTE2My4wMzE2MzAxOCAxNzEuNzAyMTQ5MjIgLTE2OC4wMjcxODQ0MyAxNjcuMzY1NzQ0NTggLTE3MyAxNjMgQy0xNzEuNTQ4MTE0MDYgMTU5LjY0OTU2NjAzIC0xNjkuNzE4MDM0MSAxNTcuNDk1MTM4MDQgLTE2Ny4xMTMyODEyNSAxNTQuOTUzMTI1IEMtMTY1Ljk1MjE1ODIgMTUzLjgwODQzNzUgLTE2NS45NTIxNTgyIDE1My44MDg0Mzc1IC0xNjQuNzY3NTc4MTIgMTUyLjY0MDYyNSBDLTE2My45NTc0MDIzNCAxNTEuODUxNzE4NzUgLTE2My4xNDcyMjY1NiAxNTEuMDYyODEyNSAtMTYyLjMxMjUgMTUwLjI1IEMtMTU1LjczMTk2MjI2IDE0My44MzQzMzQ1NSAtMTU1LjczMTk2MjI2IDE0My44MzQzMzQ1NSAtMTQ5LjU0Mjk2ODc1IDEzNy4wNDY4NzUgQy0xNDQuNTAyNTAwMTIgMTMxLjE3MjUyOTQ1IC0xMzguODkzMDc5NTUgMTI1Ljg0OTg5OTI2IC0xMzMuMzgyODEyNSAxMjAuNDIxODc1IEMtMTI5LjY2NTQ1MTc1IDExNi43Mzg0MTExNiAtMTI1Ljk5MjQ2MzIxIDExMy4wNzIyMjg3NiAtMTIyLjU4OTg0Mzc1IDEwOS4wOTM3NSBDLTExNy44ODQ0NjY1OCAxMDMuNjA1NzUzNjMgLTExMi42OTIzNzQyNiA5OC41ODU5MTU3NSAtMTA3LjU2MjUgOTMuNSBDLTEwNi41MzQyNzAyIDkyLjQ3Njc5ODYxIC0xMDUuNTA2MjczNzQgOTEuNDUzMzYyNjcgLTEwNC40Nzg1MTU2MiA5MC40Mjk2ODc1IEMtMTAxLjk4ODM1NjYyIDg3Ljk1MDQyMDAxIC05OS40OTUwNzE2NyA4NS40NzQzMjQ2MiAtOTcgODMgQy05Ny42OTI1NDg4MyA4My40NDE1MDM5MSAtOTguMzg1MDk3NjYgODMuODgzMDA3ODEgLTk5LjA5ODYzMjgxIDg0LjMzNzg5MDYyIEMtMTAzLjUzMzE5NzAxIDg3LjE2Mjc4MjM2IC0xMDcuOTY4NTM1MTcgODkuOTg2MDI0NjMgLTExMi40MjE4NzUgOTIuNzgxMjUgQy0xMjQuMTA2MjU5OTUgMTAwLjExNjk2MDQ2IC0xMzUuNjcyMjQwOTQgMTA3LjYyNTI2MzIxIC0xNDcuMjE1ODIwMzEgMTE1LjE4MDE3NTc4IEMtMTUxLjQwODgzMDQ1IDExNy45MjA4NTQyNyAtMTU1LjYxMDY1MzIgMTIwLjY0Nzg5NzI4IC0xNTkuODEyNSAxMjMuMzc1IEMtMTY3LjYxNTEwNjQxIDEyOC40NDE2Mzc4IC0xNzUuNDAyODY5NTkgMTMzLjUzMDgwNjg0IC0xODMuMTg3NSAxMzguNjI1IEMtMTkyLjQzODc5NjI3IDE0NC42Nzg1NzI4NiAtMjAxLjcwNDA2NzY0IDE1MC43MDk0NzA5MyAtMjEwLjk5MzY1MjM0IDE1Ni43MDQxMDE1NiBDLTIxMy4xMzkwMDQ3MSAxNTguMDg5NzgzMDMgLTIxNS4yODI1NzcwNyAxNTkuNDc4MTg1OTcgLTIxNy40MjU3ODEyNSAxNjAuODY3MTg3NSBDLTIyNS4yNjI1NDY4NSAxNjUuOTQ1NTI3ODYgLTIzMy4xMDg5MTY2OSAxNzEuMDA2MjkwNjkgLTI0MSAxNzYgQy0yNDMuOTIxNTE2MjIgMTczLjM0NTc1MTgyIC0yNDUuOTkwNjc2MTUgMTcwLjI2NTIyNDUyIC0yNDguMTg3NSAxNjcgQy0yNDguOTAyOTI5NjkgMTY1Ljk0ODEyNSAtMjQ5LjYxODM1OTM3IDE2NC44OTYyNSAtMjUwLjM1NTQ2ODc1IDE2My44MTI1IEMtMjUyIDE2MSAtMjUyIDE2MSAtMjUyIDE1OCBDLTI1MC42Mjk4ODI4MSAxNTYuNzc2NjExMzMgLTI1MC42Mjk4ODI4MSAxNTYuNzc2NjExMzMgLTI0OC43MDMxMjUgMTU1LjU4MjAzMTI1IEMtMjQ3LjY0MzM5NDc4IDE1NC45MTI2NDUyNiAtMjQ3LjY0MzM5NDc4IDE1NC45MTI2NDUyNiAtMjQ2LjU2MjI1NTg2IDE1NC4yMjk3MzYzMyBDLTI0NS43OTkyMTE0MyAxNTMuNzYyMDQ4MzQgLTI0NS4wMzYxNjY5OSAxNTMuMjk0MzYwMzUgLTI0NC4yNSAxNTIuODEyNSBDLTI0Mi42OTM1NTE1MyAxNTEuODM0MDYyOTQgLTI0MS4xMzc1NjUwMyAxNTAuODU0ODkwNjEgLTIzOS41ODIwMzEyNSAxNDkuODc1IEMtMjM4LjgwODExMDM1IDE0OS4zOTE2MDE1NiAtMjM4LjAzNDE4OTQ1IDE0OC45MDgyMDMxMiAtMjM3LjIzNjgxNjQxIDE0OC40MTAxNTYyNSBDLTIzNC4wOTkwMDg1MyAxNDYuNDMxOTg3OTEgLTIzMS4wMTgxNjIwNSAxNDQuMzc4NTcyNzUgLTIyNy45Mzc1IDE0Mi4zMTI1IEMtMjI2LjQ5Njk3MjY2IDE0MS4zNDc2MzY3MiAtMjI2LjQ5Njk3MjY2IDE0MS4zNDc2MzY3MiAtMjI1LjAyNzM0Mzc1IDE0MC4zNjMyODEyNSBDLTIyNC4zNTgzMjAzMSAxMzkuOTEzMzk4NDQgLTIyMy42ODkyOTY4NyAxMzkuNDYzNTE1NjMgLTIyMyAxMzkgQy0yMjguNDA5MDM0MzggMTM5LjYwMzA1NTg5IC0yMzMuNjQyOTkwODkgMTQwLjQ5MzY1NDcyIC0yMzguOTQxNDA2MjUgMTQxLjc1IEMtMjQwLjA2MzU1NTMgMTQyLjAxMDc0ODE0IC0yNDAuMDYzNTU1MyAxNDIuMDEwNzQ4MTQgLTI0MS4yMDgzNzQwMiAxNDIuMjc2NzYzOTIgQy0yNDMuNjYwNjM3OTIgMTQyLjg0NzQzODg3IC0yNDYuMTExNTQ0NTggMTQzLjQyMzczMzc4IC0yNDguNTYyNSAxNDQgQy0yNTAuMjk2Njk0MzcgMTQ0LjQwNDU1OTc5IC0yNTIuMDMwOTg5OSAxNDQuODA4Njg2MTcgLTI1My43NjUzODA4NiAxNDUuMjEyNDAyMzQgQy0yNTcuMzcyNjE5NTUgMTQ2LjA1MjM5MDczIC0yNjAuOTc5NDE1MyAxNDYuODk0MjQ1NjMgLTI2NC41ODU5Mzc1IDE0Ny43MzczMDQ2OSBDLTI2OS43ODQzNTE1IDE0OC45NTEyNDU2MiAtMjc0Ljk4NTM2NTg3IDE1MC4xNTM2NzQ3MiAtMjgwLjE4NzUgMTUxLjM1MTU2MjUgQy0yODEuMDA5MTA2MTQgMTUxLjU0MDc2MjYzIC0yODEuODMwNzEyMjggMTUxLjcyOTk2Mjc3IC0yODIuNjc3MjE1NTggMTUxLjkyNDg5NjI0IEMtMjg0LjMyMTM5OTg3IDE1Mi4zMDM0MzQzNSAtMjg1Ljk2NTU5NTM1IDE1Mi42ODE5MjM4NiAtMjg3LjYwOTgwMjI1IDE1My4wNjAzNjM3NyBDLTI5Ny40MDc2ODE4NyAxNTUuMzE1OTM2MzYgLTMwNy4yMDQ4OTkyOSAxNTcuNTczODQ0MDcgLTMxNi45OTIxODc1IDE1OS44NzUgQy0zMzAuNjE2ODQ3MTMgMTYzLjA3ODE1NzIyIC0zNDQuMjU2Nzg2MTQgMTY2LjE3NjAxNjIgLTM1Ny45MzY1ODQ0NyAxNjkuMTMzMTQ4MTkgQy0zNjYuNzgxMzM5NTcgMTcxLjA0NTkzNDc5IC0zNzUuNTg0NDQyMDcgMTczLjA1MDcwMTA2IC0zODQuMzMyMDMxMjUgMTc1LjM3MTA5Mzc1IEMtMzg3IDE3NiAtMzg3IDE3NiAtMzkwIDE3NiBDLTM5MS4zMiAxNjkuNCAtMzkyLjY0IDE2Mi44IC0zOTQgMTU2IEMtMzgwLjkwNjczNzY3IDE1Mi42MTUwOTQxMSAtMzY3Ljc4NTA3NTY1IDE0OS40NjU1MjMxMiAtMzU0LjU2MjUgMTQ2LjYyNSBDLTM0My40OTgyMzY3IDE0NC4yNDc0NTQ2MSAtMzMyLjQ4ODQ1OTQgMTQxLjcwNjIwNjUxIC0zMjEuNSAxMzkgQy0zMTAuNjk3ODQ2NjcgMTM2LjM0MDUwMzc3IC0yOTkuODc2Nzg2NTkgMTMzLjgzNTYyNjM4IC0yODkgMTMxLjUgQy0yNzUuNzA1MjUwMDcgMTI4LjY0NDc1NzIyIC0yNjIuNDg4ODUxNjMgMTI1LjUxNzAyNzg5IC0yNDkuMjg0ODgxNTkgMTIyLjI2OTA0Mjk3IEMtMjQ2LjE5MDg3MDQ5IDEyMS41MDg3OTQ5MSAtMjQzLjA5NTQ4ODg0IDEyMC43NTQyMDU0MyAtMjQwIDEyMCBDLTIzOC43OTAwNTM3MSAxMTkuNzAyODcxMDkgLTIzNy41ODAxMDc0MiAxMTkuNDA1NzQyMTkgLTIzNi4zMzM0OTYwOSAxMTkuMDk5NjA5MzggQy0yMzUuMTg1NzQ3MDcgMTE4LjgyNDM5NDUzIC0yMzQuMDM3OTk4MDUgMTE4LjU0OTE3OTY5IC0yMzIuODU1NDY4NzUgMTE4LjI2NTYyNSBDLTIzMS4zMzk4OTM4IDExNy44OTg3MjU1OSAtMjMxLjMzOTg5MzggMTE3Ljg5ODcyNTU5IC0yMjkuNzkzNzAxMTcgMTE3LjUyNDQxNDA2IEMtMjI3LjExOTE4MDM4IDExNy4wMjIzNzE3MSAtMjI0LjcxMjk0ODk4IDExNi44OTk0Mzk5NCAtMjIyIDExNyBDLTIyMS4zMjkwMDAxNiAxMTkuNjAzMTE5OTIgLTIyMC42NjMwNDY2MiAxMjIuMjA3MzUzOTggLTIyMCAxMjQuODEyNSBDLTIxOS44MDkyMTg3NSAxMjUuNTUwNDg4MjggLTIxOS42MTg0Mzc1IDEyNi4yODg0NzY1NiAtMjE5LjQyMTg3NSAxMjcuMDQ4ODI4MTIgQy0yMTguNjQ3MzcwODYgMTMwLjEwNTM1MzQxIC0yMTggMTMyLjgzMzczNDc4IC0yMTggMTM2IEMtMjA2LjUwNDc3NzMgMTI4LjU2OTc5Nzc2IC0xOTUuMDIyNTk0IDEyMS4xMTk3NjQyMSAtMTgzLjU0ODMzOTg0IDExMy42NTcyMjY1NiBDLTE3OS4zNjYwNDEzNiAxMTAuOTM3NDEwMyAtMTc1LjE4Mjk3NzU5IDEwOC4yMTg3NzE2NSAtMTcxIDEwNS41IEMtMTcwLjE3MzA2NjQxIDEwNC45NjI0NjA5NCAtMTY5LjM0NjEzMjgxIDEwNC40MjQ5MjE4OCAtMTY4LjQ5NDE0MDYyIDEwMy44NzEwOTM3NSBDLTE2NC4zNjQ5MzkxNyAxMDEuMTg2OTUxODkgLTE2MC4yMzU0NzkxNSA5OC41MDMyMDk1MiAtMTU2LjEwNTQ2ODc1IDk1LjgyMDMxMjUgQy0xNTQuNDY2MTI2OTEgOTQuNzU1MjM3NDcgLTE1Mi44MjY4MDQwNCA5My42OTAxMzMyMSAtMTUxLjE4NzUgOTIuNjI1IEMtMTUwLjM3Njc2MDI1IDkyLjA5ODI1Njg0IC0xNDkuNTY2MDIwNTEgOTEuNTcxNTEzNjcgLTE0OC43MzA3MTI4OSA5MS4wMjg4MDg1OSBDLTE0NC4xNTU4NjQ0MyA4OC4wNTUyNjg5NSAtMTM5LjU4NDE4NjI5IDg1LjA3Njk0MTQgLTEzNS4wMTU2MjUgODIuMDkzNzUgQy0xMzQuMDAzNDY5MjQgODEuNDMyOTQ0MzQgLTEzMi45OTEzMTM0OCA4MC43NzIxMzg2NyAtMTMxLjk0ODQ4NjMzIDgwLjA5MTMwODU5IEMtMTMwLjAwNzg0MjcgNzguODIzOTgxNiAtMTI4LjA2NzU0ODc3IDc3LjU1NjExODg3IC0xMjYuMTI3Njg1NTUgNzYuMjg3NTk3NjYgQy0xMjQuMzMwMjQ3NDUgNzUuMTEzNzgwMjUgLTEyMi41MzEwNDczOCA3My45NDI2NTU4OSAtMTIwLjcyOTk4MDQ3IDcyLjc3NDQxNDA2IEMtMTE4LjgwNjgxMzk1IDcxLjUyNDQwNzQyIC0xMTYuODg5NzAxNTkgNzAuMjY1MDYxNzIgLTExNC45NzcwNTA3OCA2OC45OTkwMjM0NCBDLTExMy45OTU5MTMwOSA2OC4zNTczOTI1OCAtMTEzLjAxNDc3NTM5IDY3LjcxNTc2MTcyIC0xMTIuMDAzOTA2MjUgNjcuMDU0Njg3NSBDLTExMS4xMTY0NjcyOSA2Ni40NjkyOTE5OSAtMTEwLjIyOTAyODMyIDY1Ljg4Mzg5NjQ4IC0xMDkuMzE0Njk3MjcgNjUuMjgwNzYxNzIgQy0xMDcgNjQgLTEwNyA2NCAtMTA0IDY0IEMtMTAyLjI5NTg5ODI3IDY2LjMwNzQ1MzgxIC0xMDAuNzkxODM3NTYgNjguNTU1NjcxOTEgLTk5LjMxMjUgNzEgQy05OC44OTY3NzczNCA3MS42Njc3MzQzOCAtOTguNDgxMDU0NjkgNzIuMzM1NDY4NzUgLTk4LjA1MjczNDM4IDczLjAyMzQzNzUgQy05Ny4wMjU1NTc3NiA3NC42NzYzNjUzOCAtOTYuMDExNTI2NjQgNzYuMzM3NDQ4ODggLTk1IDc4IEMtOTEuMzU4Mzk5MDEgNzYuNDY0ODgxNzcgLTg5LjAzNTU2Nzg1IDc0LjI4MDAzMzQ2IC04Ni4yNjE3MTg3NSA3MS40OTIxODc1IEMtODUuMzU4NzMwNDcgNzAuNTg3MjY1NjMgLTg0LjQ1NTc0MjE5IDY5LjY4MjM0Mzc1IC04My41MjUzOTA2MiA2OC43NSBDLTgzLjA1ODUwODMgNjguMjc2OTE0MDYgLTgyLjU5MTYyNTk4IDY3LjgwMzgyODEzIC04Mi4xMTA1OTU3IDY3LjMxNjQwNjI1IEMtODAuNzA3NjU4NzkgNjUuODk1NDE4MTcgLTc5LjI5NjI2NTA3IDY0LjQ4Mjc5NTU3IC03Ny44ODQ3NjU2MiA2My4wNzAzMTI1IEMtNzMuMjc3NjMyMTkgNTguNDMzNzA5MTMgLTY4LjgxNDE3MDM4IDUzLjczNzQ2NTA2IC02NC41NTczNzMwNSA0OC43Nzc4MzIwMyBDLTYyLjE3ODkxNzU4IDQ2LjA2MjY4NjYgLTU5LjYzNjgwNTAzIDQzLjUyODAxNzM4IC01Ny4wNjI1IDQxIEMtNTYuNTY5NDMzNTkgNDAuNTExNDQ1MzEgLTU2LjA3NjM2NzE5IDQwLjAyMjg5MDYyIC01NS41NjgzNTkzOCAzOS41MTk1MzEyNSBDLTU0LjM4MTI2NzcxIDM4LjM0Mzk2NDc1IC01My4xOTA5OTUwMiAzNy4xNzE2MTE3NCAtNTIgMzYgQy00OC4xMDA4MjAzMiAzNy42MTUzNzQ0NCAtNDUuMjg3MDYyMjggNDAuMjc5MjQ4NzMgLTQyLjI1IDQzLjEyNSBDLTQxLjQ5MDA5NzY2IDQzLjgyNjg5NDUzIC00MS40OTAwOTc2NiA0My44MjY4OTQ1MyAtNDAuNzE0ODQzNzUgNDQuNTQyOTY4NzUgQy0zOS40NzI4MDg1OSA0NS42OTEyNjU0MSAtMzguMjM1ODg1MDYgNDYuODQ1MDg2NzIgLTM3IDQ4IEMtMzEuNzgxMzEzNzggMzYuNTU5MDM0MDUgLTI3LjIyNzI0MTM3IDI0Ljg4OTkxMDMyIC0yMy4wNzgxMjUgMTMuMDIzNDM3NSBDLTIyLjExMzk0ODYgMTAuMzE5NTUxNTEgLTIxLjA4NjM5NTE2IDcuNjU2NzI5OTcgLTIwIDUgQy0xNS4yNzQ5NzI5OSA1LjYzMjQyNjY5IC0xMS4wOTQyOTgwMyA2LjkxODEzNTYzIC02LjYyNSA4LjU2MjUgQy01Ljk4NDMzNTk0IDguNzk2NDY0ODQgLTUuMzQzNjcxODcgOS4wMzA0Mjk2OSAtNC42ODM1OTM3NSA5LjI3MTQ4NDM4IEMtMy4xMjA2ODM5IDkuODQyOTk2MTkgLTEuNTYwMDkyNzMgMTAuNDIwODQyMjkgMCAxMSBDMCA3LjM3IDAgMy43NCAwIDAgWiAiIGZpbGw9IiM2M0JCRTQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwNDAsMTE1NSkiLz4KPHBhdGggZD0iTTAgMCBDNi42IDAgMTMuMiAwIDIwIDAgQzI0Ljk4Njg3MDcxIDMwLjk2MDE1NTY4IDI1LjI0NjYwMjkyIDYzLjIwOTYxNDQ4IDE5IDk0IEMxOC42OTU5OTE4NCA5NS42MzEzOTQ0OSAxOC4zOTI1NjkxNyA5Ny4yNjI4OTgyNCAxOC4wODk4NDM3NSA5OC44OTQ1MzEyNSBDOS45MDE5NzUyMiAxNDAuODcyNTMyNjYgLTExLjc4NTk3OTM4IDE4MC4yMzIwMjgyIC00MCAyMTIgQy00MS4zMDUxNzU3OCAyMTMuNDg4ODY3MTkgLTQxLjMwNTE3NTc4IDIxMy40ODg4NjcxOSAtNDIuNjM2NzE4NzUgMjE1LjAwNzgxMjUgQy01NC40MTc1NDk4OSAyMjguMjc4NTQ2ODQgLTY3LjYxOTg2NTg2IDIzOS42MzI0ODAwNiAtODIgMjUwIEMtODIuNzA2MDgzOTggMjUwLjUwOTE3OTY5IC04My40MTIxNjc5NyAyNTEuMDE4MzU5MzggLTg0LjEzOTY0ODQ0IDI1MS41NDI5Njg3NSBDLTEwNy41ODI4NDkyOSAyNjguMjM3NTMxOTIgLTEzNC42ODEyMzg1MSAyODEuNjkxNjQxNjYgLTE2Mi43MzA5NTcwMyAyODguNDQ2Nzc3MzQgQy0xNjUuMTQwNTQ2NTggMjg5LjAzNDI2NzExIC0xNjcuNTM2MTQ1OTIgMjg5LjY2NTY1NTYxIC0xNjkuOTMzNTkzNzUgMjkwLjMwMDc4MTI1IEMtMjMxLjU0MzA3MTAyIDMwNi4yNzg1OTc5NiAtMjk5Ljk1MTYyMDUzIDI5NS44MDEyNzI3MyAtMzU0Ljk0NTMxMjUgMjY0LjIwNzAzMTI1IEMtMzczLjE1ODU0NTgyIDI1My40MzIyNTgzMyAtMzg5LjY4MDI2MjU1IDI0MC41OTA4Njg4OSAtNDA1IDIyNiBDLTQwNS41OTg5MzA2NiAyMjUuNDI5NzUwOTggLTQwNi4xOTc4NjEzMyAyMjQuODU5NTAxOTUgLTQwNi44MTQ5NDE0MSAyMjQuMjcxOTcyNjYgQy00MTUuNzA3MTE3MzYgMjE1Ljc0MjM2ODAxIC00MjMuNzAxMDc3MzUgMjA2LjkyNDI5MzI5IC00MzEgMTk3IEMtNDMxLjQyNjE5NjI5IDE5Ni40MjkyNjc1OCAtNDMxLjg1MjM5MjU4IDE5NS44NTg1MzUxNiAtNDMyLjI5MTUwMzkxIDE5NS4yNzA1MDc4MSBDLTQ0MC42OTU0MzkwMSAxODMuOTk1MzA3NzEgLTQ0Ny44NTU1NDAwMyAxNzIuMDk5MTU2MjUgLTQ1NC41NjI1IDE1OS43NSBDLTQ1NS4wODI4Nzg0MiAxNTguODAxNjkzMTIgLTQ1NS4wODI4Nzg0MiAxNTguODAxNjkzMTIgLTQ1NS42MTM3Njk1MyAxNTcuODM0MjI4NTIgQy00NTcuMTIxMTYyMDkgMTU1LjAwNjAzMjQ5IC00NTggMTUzLjI1NjAwODggLTQ1OCAxNTAgQy00NTAuNzQgMTUwIC00NDMuNDggMTUwIC00MzYgMTUwIEMtNDM0LjY4IDE1Mi4zOTI1IC00MzMuMzYgMTU0Ljc4NSAtNDMyIDE1Ny4yNSBDLTQxNy43NTI5MjUxMSAxODIuNzAyNDY1MTggLTM5OC44Njg5NTA1IDIwNS44NTY4NTg2MyAtMzc2IDIyNCBDLTM3NC44MTY2NDA2MiAyMjQuOTg0MTk5MjIgLTM3NC44MTY2NDA2MiAyMjQuOTg0MTk5MjIgLTM3My42MDkzNzUgMjI1Ljk4ODI4MTI1IEMtMzI3LjY4NDcxOTYyIDI2My45MjkzNDU4OCAtMjY2LjEzNjY3NjYyIDI4MC4yODgxNjYzMiAtMjA3LjI4OTU1MDc4IDI3NS43MTE0MjU3OCBDLTE2MC4yNjUyNjcxNCAyNzAuODMwMTI1NjEgLTExNC43NzI3Mjc5NCAyNTEuODcyNzgzNjEgLTc5IDIyMSBDLTc4LjExMzEyNSAyMjAuMjQzMzIwMzEgLTc3LjIyNjI1IDIxOS40ODY2NDA2MyAtNzYuMzEyNSAyMTguNzA3MDMxMjUgQy00Ni4yODg1MTU0MSAxOTIuMzg2NjYzMTggLTI0LjE1MjczMjU2IDE1OS43OTUyODIwNSAtMTAuNzc1MzkwNjIgMTIyLjE0Njk3MjY2IEMtMTAuMTUyMjc3ODIgMTIwLjQyMTY0MDc4IC05LjQ4MTk4OTE0IDExOC43MTMzODIxMyAtOC43OTY4NzUgMTE3LjAxMTcxODc1IEMtNi4zOTU4MjE0NiAxMTEuMDM3NjY4ODggLTQuOTAzMDE3MDEgMTA0Ljg4MDgxMzQxIC0zLjQzNzUgOTguNjI1IEMtMy4yMzkzODcyMSA5Ny43OTQyNzk3OSAtMy4wNDEyNzQ0MSA5Ni45NjM1NTk1NyAtMi44MzcxNTgyIDk2LjEwNzY2NjAyIEMwLjg3MjU2MTcxIDc5LjU5Mzk3MjcgMi40ODcwNzE3OCA2My4yMzY2MTA1OSAyLjMzNjE4MTY0IDQ2LjMzMTA1NDY5IEMyLjMxMjI3NDM2IDQzLjQ3MzAyNTc0IDIuMzE1Njk2OTQgNDAuNjE1OTE4NDkgMi4zMjIyNjU2MiAzNy43NTc4MTI1IEMyLjMwNzgzMzQgMjkuMDIxNTA0OTggMi4xNTc4NTYyMSAyMC41Njc4MDc1MSAwLjQyNjUxMzY3IDExLjk2Njc5Njg4IEMtMC4xNDE0NjkyOSA4LjAxNTk1MDI4IDAgMy45OTE0NjUwOCAwIDAgWiAiIGZpbGw9IiNGRkZGRkYiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDExOTUsMTE5NykiLz4KPHBhdGggZD0iTTAgMCBDMS4zMDUxNzU3OCAxLjAxMTI2OTUzIDEuMzA1MTc1NzggMS4wMTEyNjk1MyAyLjYzNjcxODc1IDIuMDQyOTY4NzUgQzguNDI5NjYxNzEgNi42NTgyNzMwOCAxMy44OTM3MTE1MiAxMS41NzkxMDk0IDE5LjMxMjUgMTYuNjI1IEMxOS45ODI0OTAyMyAxNy4yNDY0ODkyNiAyMC42NTI0ODA0NyAxNy44Njc5Nzg1MiAyMS4zNDI3NzM0NCAxOC41MDgzMDA3OCBDMjQuNTA0MzU1NiAyMS40ODQ2MDMxOSAyNy41OTU2MjEwMyAyNC41MjE0NDY3NyAzMC41NDI5Njg3NSAyNy43MTA5Mzc1IEMzMS4wNDIwNzc2NCAyOC4yNDc2NzA5IDMxLjU0MTE4NjUyIDI4Ljc4NDQwNDMgMzIuMDU1NDE5OTIgMjkuMzM3NDAyMzQgQzMzIDMxIDMzIDMxIDMyLjgxMDA1ODU5IDMzLjAzMDc2MTcyIEMzMS40ODQ2ODAxOSAzNi4yNTI3MzM0NSAyOC45MTgwMzA1NCAzOC4zOTAyNDQzNiAyNi40Mzc1IDQwLjc1IEMyNS45MTczNjMyOCA0MS4yNTY2MDE1NiAyNS4zOTcyMjY1NiA0MS43NjMyMDMxMyAyNC44NjEzMjgxMiA0Mi4yODUxNTYyNSBDMjMuNTgwODk5MTYgNDMuNTMwMzQ0MDUgMjIuMjkxMzI0NDYgNDQuNzY2MTE1MDIgMjEgNDYgQzE3LjU4MDA5OTM0IDQ0LjUzMDIxNTI4IDE1LjQxOTQ0Mzc2IDQyLjYyOTMzOTc1IDEyLjgzOTg0Mzc1IDM5Ljk2NDg0Mzc1IEMxMi4wNTIwNjU0MyAzOS4xNTk5MDQ3OSAxMS4yNjQyODcxMSAzOC4zNTQ5NjU4MiAxMC40NTI2MzY3MiAzNy41MjU2MzQ3NyBDOS42MjI2NDE2IDM2LjY3MTU1MDI5IDguNzkyNjQ2NDggMzUuODE3NDY1ODIgNy45Mzc1IDM0LjkzNzUgQzEuMjQyMzEzMDMgMjguMTU5OTkwMDEgLTUuMzE1ODgwNjggMjEuNjU3NTM4NCAtMTMgMTYgQy0xMy42MDQ1NzAzMSAxNS41NTE0MDYyNSAtMTQuMjA5MTQwNjIgMTUuMTAyODEyNSAtMTQuODMyMDMxMjUgMTQuNjQwNjI1IEMtNjYuOTYwMTE4MTYgLTIzLjgyMjgxNzc3IC0xMjkuMDk1OTcyMSAtMzkuNTg2MjkzNDMgLTE5My4yNDYwOTM3NSAtMzAuMjU3ODEyNSBDLTIzNy40NDg4MDQzNSAtMjMuNTU1MDYyMzQgLTI3Ny42NTQxOTI0OSAtMy40NTgwNDgyNCAtMzExIDI2IEMtMzExLjUxODM2NDI2IDI2LjQ1NTIwMDIgLTMxMi4wMzY3Mjg1MiAyNi45MTA0MDAzOSAtMzEyLjU3MDgwMDc4IDI3LjM3OTM5NDUzIEMtMzQwLjIyODA4NTcxIDUxLjc3Nzc4Mjg0IC0zNjEuMDY1MjQwODggODMuNTQ3NjA0MjIgLTM3NCAxMTggQy0zNzQuMjU3MzI5MSAxMTguNjY2OTI4NzEgLTM3NC41MTQ2NTgyIDExOS4zMzM4NTc0MiAtMzc0Ljc3OTc4NTE2IDEyMC4wMjA5OTYwOSBDLTM4MC4zMjM1MzAwMiAxMzQuNTU5NzIxNTQgLTM4My4xNjQ3MzkwNiAxNDkuNzQyMzUxMDMgLTM4NiAxNjUgQy0zODYuMTQ0NTM2MTMgMTY1Ljc1MzQ1NzAzIC0zODYuMjg5MDcyMjcgMTY2LjUwNjkxNDA2IC0zODYuNDM3OTg4MjggMTY3LjI4MzIwMzEyIEMtMzg3LjY5NDMzNjAxIDE3NC4wMDQ5Mjg1MyAtMzg4LjA4MDM3NDU5IDE4MC43NDAzODc4NyAtMzg4LjMzMjAzMTI1IDE4Ny41NjI1IEMtMzg4LjM1NzMxOTAzIDE4OC4yNDA3MTMwNCAtMzg4LjM4MjYwNjgxIDE4OC45MTg5MjYwOSAtMzg4LjQwODY2MDg5IDE4OS42MTc2OTEwNCBDLTM4OC42NTU1NTkzMSAxOTYuNDEwNTUxNTIgLTM4OC44MzI4NjY3NiAyMDMuMjA0NzE0MjYgLTM4OSAyMTAgQy0zOTUuNiAyMTAgLTQwMi4yIDIxMCAtNDA5IDIxMCBDLTQwOS4zNTE3ODc2MyAxOTIuMzg0NTYwMzkgLTQwOC44ODAyMjIyNSAxNzUuMzk1NzQxNTIgLTQwNiAxNTggQy00MDUuNzU4NTQyNDggMTU2LjQ5OTA0Nzg1IC00MDUuNzU4NTQyNDggMTU2LjQ5OTA0Nzg1IC00MDUuNTEyMjA3MDMgMTU0Ljk2Nzc3MzQ0IEMtMzk5LjE2MTYzMTI0IDExNi42MjAzMDA0NCAtMzgzLjUzNTU2MjEgNzkuOTU5Mjg4OSAtMzYwIDQ5IEMtMzU5LjU2NzE5NzI3IDQ4LjQyNDQzMzU5IC0zNTkuMTM0Mzk0NTMgNDcuODQ4ODY3MTkgLTM1OC42ODg0NzY1NiA0Ny4yNTU4NTkzOCBDLTM1MS45NjQ4NDY5IDM4LjM0NjY4MTczIC0zNDQuNzM5NjQyMTggMzAuMDM3ODk0MjkgLTMzNyAyMiBDLTMzNi40OTgyMzI0MiAyMS40NzYzMTgzNiAtMzM1Ljk5NjQ2NDg0IDIwLjk1MjYzNjcyIC0zMzUuNDc5NDkyMTkgMjAuNDEzMDg1OTQgQy0zMjguNzE4NzQ0MjcgMTMuMzkxNDczMTUgLTMyMS42OTIxMjE1NCA3LjAwODgwNDA4IC0zMTQgMSBDLTMxMy4wMjgwNDY4NyAwLjIxMTA5Mzc1IC0zMTIuMDU2MDkzNzUgLTAuNTc3ODEyNSAtMzExLjA1NDY4NzUgLTEuMzkwNjI1IEMtMzAyLjg2ODYwNzg0IC03LjkxNDg2ODk0IC0yOTQuMjI0MDk5ODYgLTEzLjQwOTI5MTA4IC0yODUuMjAwNjgzNTkgLTE4LjcwMzYxMzI4IEMtMjgzLjE5MTIzMDM5IC0xOS44ODczNDkzIC0yODEuMTk4MzEzNTEgLTIxLjA5NDY1NDE2IC0yNzkuMjA3MDMxMjUgLTIyLjMwODU5Mzc1IEMtMTk4Ljk4MjYwNzQ5IC03MC4zMTU4MjMzNyAtOTAuOTgxNTg3NDcgLTYzLjMyNTg4Njk4IDAgMCBaICIgZmlsbD0iI0ZGRkZGRiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTEyMiwxMDQyKSIvPgo8cGF0aCBkPSJNMCAwIEM2LjYgMCAxMy4yIDAgMjAgMCBDMjAgNTguMDggMjAgMTE2LjE2IDIwIDE3NiBDMTMuNCAxNzYgNi44IDE3NiAwIDE3NiBDLTAuMzMgMTIyLjg3IC0wLjY2IDY5Ljc0IC0xIDE1IEMtNi45NCAzMC41MSAtMTIuODggNDYuMDIgLTE5IDYyIEMtMjYuNDE4MjE0MTQgODEuMzEwOTA2NjYgLTMzLjg0NjA4MDkgMTAwLjYxNzM4MjQzIC00MS4zMjUzMTczOCAxMTkuOTA0NjMyNTcgQy00NC40MDc1NDkxNCAxMjcuODU1MjExODEgLTQ3LjQ1MjMwNDg2IDEzNS44MTY4MTc4NyAtNTAuNDI1NzgxMjUgMTQzLjgwODU5Mzc1IEMtNTIuNjgyNDM1MDcgMTQ5Ljg0NTQ5MjE2IC01NS4wMDE1MjQ0OCAxNTUuODU4NzQ2ODUgLTU3LjMxMjUgMTYxLjg3NSBDLTU3Ljc1ODAzMjIzIDE2My4wMzY4NDgxNCAtNTguMjAzNTY0NDUgMTY0LjE5ODY5NjI5IC01OC42NjI1OTc2NiAxNjUuMzk1NzUxOTUgQy01OS4wNzk0NDgyNCAxNjYuNDc5NDUwNjggLTU5LjQ5NjI5ODgzIDE2Ny41NjMxNDk0MSAtNTkuOTI1NzgxMjUgMTY4LjY3OTY4NzUgQy02MC4zMDEzMDEyNyAxNjkuNjU2NjM1NzQgLTYwLjY3NjgyMTI5IDE3MC42MzM1ODM5OCAtNjEuMDYzNzIwNyAxNzEuNjQwMTM2NzIgQy02MiAxNzQgLTYyIDE3NCAtNjMgMTc2IEMtNjkuNjE3OTgzOTYgMTc0LjE3NjI1NDk0IC03NS43ODg2OTg4NSAxNzEuOTE2NTE0ODggLTgyIDE2OSBDLTgwLjEwNjUwNDE4IDE2Mi40MDM0ODUwNyAtNzcuOTYwMTE2NTggMTU1Ljk3NTE2Mzk2IC03NS40ODgyODEyNSAxNDkuNTc0MjE4NzUgQy03NS4xNTYzNjI3NiAxNDguNzA1OTM5NDggLTc0LjgyNDQ0NDI3IDE0Ny44Mzc2NjAyMiAtNzQuNDgyNDY3NjUgMTQ2Ljk0MzA2OTQ2IEMtNzMuNDI5MTY4MDEgMTQ0LjE4OTkxMzI0IC03Mi4zNzA5Nzc5NiAxNDEuNDM4NjY4OTMgLTcxLjMxMjUgMTM4LjY4NzUgQy03MC42MjI3MTI4IDEzNi44ODc0OTc3OCAtNjkuOTMzMjU3NiAxMzUuMDg3MzY4MjkgLTY5LjI0NDE0MDYyIDEzMy4yODcxMDkzOCBDLTY3Ljg2MzMyODUzIDEyOS42ODA3Njk4NiAtNjYuNDgwMzgxOTcgMTI2LjA3NTI1ODg0IC02NS4wOTYxOTE0MSAxMjIuNDcwMjE0ODQgQy02My42NzA0NzE3NyAxMTguNzU0MDk4NzcgLTYyLjI1MTI3NTYgMTE1LjAzNTU4MDczIC02MC44Mzc0MDIzNCAxMTEuMzE0OTQxNDEgQy02MC40ODM5NzI2MyAxMTAuMzg1MDI4ODQgLTYwLjEzMDU0MjkxIDEwOS40NTUxMTYyNyAtNTkuNzY2NDAzMiAxMDguNDk3MDI0NTQgQy01OS4xMDEyNzk2MyAxMDYuNzQ1ODMyNTcgLTU4LjQzNjg0MjE4IDEwNC45OTQzNzk3NyAtNTcuNzczMjY5NjUgMTAzLjI0MjU5OTQ5IEMtNTUuODY4ODMxNjggOTguMjI5MTg5MjMgLTUzLjkxMTEzODU4IDkzLjI0MDE4NjI2IC01MS45MDc1MDEyMiA4OC4yNjU1NjM5NiBDLTUwLjQ2Njk2OTI0IDg0LjY2OTI5NjI2IC00OS4wODA0OTA1MyA4MS4wNTIzNzgxNyAtNDcuNjg3NSA3Ny40Mzc1IEMtNDUuNjY4NDE0NjQgNzIuMjA3NDk2NjkgLTQzLjU5OTMyNzA0IDY3LjAwNzUxMTk5IC00MS40MTg3MDExNyA2MS44NDI3NzM0NCBDLTM3Ljg2MTA4MjUxIDUzLjQwNjc0MzU1IC0zNC44MDgzNTA2MiA0NC44NDY3OTQwMSAtMzEuODQ4ODc2OTUgMzYuMTgzODM3ODkgQy0yOS43OTk4NDk1NyAzMC4yMTIzMTUwMiAtMjcuNjEwNTYwNTEgMjQuMzg2MjA3MjcgLTI1LjA5NzY1NjI1IDE4LjU5Mzc1IEMtMjMuMjA5OTUyNjcgMTQuMTMzMTI2NTkgLTIxLjYwOTI1OTQ5IDkuNTY3MDYwNDQgLTIwIDUgQy0xNS4yNzQ5NzI5OSA1LjYzMjQyNjY5IC0xMS4wOTQyOTgwMyA2LjkxODEzNTYzIC02LjYyNSA4LjU2MjUgQy01Ljk4NDMzNTk0IDguNzk2NDY0ODQgLTUuMzQzNjcxODcgOS4wMzA0Mjk2OSAtNC42ODM1OTM3NSA5LjI3MTQ4NDM4IEMtMy4xMjA2ODM5IDkuODQyOTk2MTkgLTEuNTYwMDkyNzMgMTAuNDIwODQyMjkgMCAxMSBDMCA3LjM3IDAgMy43NCAwIDAgWiAiIGZpbGw9IiMxNjY4OUIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwNDAsMTE1NSkiLz4KPHBhdGggZD0iTTAgMCBDNC4wODM2NjMzNSAxLjY2NTE4MzExIDcuMDYwMzc3ODUgNC41NDY5Mjg3NyAxMC4yNSA3LjUgQzEwLjgwNDI5Njg3IDcuOTk4ODY3MTkgMTEuMzU4NTkzNzUgOC40OTc3MzQzNyAxMS45Mjk2ODc1IDkuMDExNzE4NzUgQzEzLjMyODUwMDggMTAuMjk2ODM1NCAxNC42Njk0NDI1NCAxMS42NDQzMzc2OCAxNiAxMyBDMTYgMTMuNjYgMTYgMTQuMzIgMTYgMTUgQzE0LjUzMzQ0NzI3IDE2LjQ0NzUwOTc3IDE0LjUzMzQ0NzI3IDE2LjQ0NzUwOTc3IDEyLjUwMzkwNjI1IDE4LjEyODkwNjI1IEM4LjEwNDM0MzE0IDIxLjg3MTg3NTk2IDQuMDA4NTE1NTIgMjUuODQyNzkyODIgLTAuMDYyNSAyOS45Mzc1IEMtMC43MzA4Nzg5MSAzMC42MDIwMTE3MiAtMS4zOTkyNTc4MSAzMS4yNjY1MjM0NCAtMi4wODc4OTA2MiAzMS45NTExNzE4OCBDLTUuMjkwMTQxNzUgMzUuMTU5NjQ3MDEgLTguMzg5OTE2OTcgMzguNDA1MDU5NDkgLTExLjMzOTg0Mzc1IDQxLjg0NzY1NjI1IEMtMTYuNjI3OTk5MTEgNDcuOTc1ODY2ODcgLTIyLjUwMTUzMTc4IDUzLjU0Mzk0MjkzIC0yOC4yNjE3MTg3NSA1OS4yMjI2NTYyNSBDLTMyLjEyNzM5NzYzIDYzLjA1NDg2NjA1IC0zNS45NTc5MzkyNCA2Ni44NjQxMTA4NyAtMzkuNSA3MSBDLTQ0LjcxNjgwMjg3IDc3LjA5MTQwMjY0IC01MC41NTQ4Nzc0IDgyLjU5NjUzNDAyIC01Ni4yNjE3MTg3NSA4OC4yMjI2NTYyNSBDLTYwLjEyNzM5NzYzIDkyLjA1NDg2NjA1IC02My45NTc5MzkyNCA5NS44NjQxMTA4NyAtNjcuNSAxMDAgQy03Mi43MTY4MDI4NyAxMDYuMDkxNDAyNjQgLTc4LjU1NDg3NzQgMTExLjU5NjUzNDAyIC04NC4yNjE3MTg3NSAxMTcuMjIyNjU2MjUgQy04OC44NzE5OTcxIDEyMS43OTMwMTg3NyAtOTMuMzM4MDAyNDIgMTI2LjQwMjc0MTE4IC05Ny41NjEwMzUxNiAxMzEuMzMzOTg0MzggQy05OS4yNjk2NzM4IDEzMy4zMTIyMjQ5OCAtMTAxLjA3MDUyMTg0IDEzNS4xNzExMjM0NCAtMTAyLjkzNzUgMTM3IEMtMTAzLjUyNDAyMzQ0IDEzNy41Nzc1IC0xMDQuMTEwNTQ2ODcgMTM4LjE1NSAtMTA0LjcxNDg0Mzc1IDEzOC43NSBDLTEwNS4xMzg5NDUzMSAxMzkuMTYyNSAtMTA1LjU2MzA0Njg4IDEzOS41NzUgLTEwNiAxNDAgQy0xMTEuMDMxNjMwMTggMTM1LjcwMjE0OTIyIC0xMTYuMDI3MTg0NDMgMTMxLjM2NTc0NDU4IC0xMjEgMTI3IEMtMTE5LjU0ODExNDA2IDEyMy42NDk1NjYwMyAtMTE3LjcxODAzNDEgMTIxLjQ5NTEzODA0IC0xMTUuMTEzMjgxMjUgMTE4Ljk1MzEyNSBDLTExNC4zMzkxOTkyMiAxMTguMTkgLTExMy41NjUxMTcxOSAxMTcuNDI2ODc1IC0xMTIuNzY3NTc4MTIgMTE2LjY0MDYyNSBDLTExMS45NTc0MDIzNCAxMTUuODUxNzE4NzUgLTExMS4xNDcyMjY1NiAxMTUuMDYyODEyNSAtMTEwLjMxMjUgMTE0LjI1IEMtMTAzLjczMTk2MjI2IDEwNy44MzQzMzQ1NSAtMTAzLjczMTk2MjI2IDEwNy44MzQzMzQ1NSAtOTcuNTQyOTY4NzUgMTAxLjA0Njg3NSBDLTkyLjUwMjUwMDEyIDk1LjE3MjUyOTQ1IC04Ni44OTMwNzk1NSA4OS44NDk4OTkyNiAtODEuMzgyODEyNSA4NC40MjE4NzUgQy03Ny42NzM2NjQwNyA4MC43NDY1NDg1OSAtNzQuMDA4NDM4OTUgNzcuMDkwMjA2MDMgLTcwLjYxNzE4NzUgNzMuMTE3MTg3NSBDLTY1Ljc4MTQ4NTEzIDY3LjQ3NjAwNzQ0IC02MC40MDkzNTk3IDYyLjM0MDU2MTQ3IC01NS4xMjUgNTcuMTI1IEMtNTMuMDQxMzk3NDUgNTUuMDY3OTgwNDcgLTUwLjk2MTEzOTc3IDUzLjAwNzY2MDE2IC00OC44ODI4MTI1IDUwLjk0NTMxMjUgQy00Ny45NjkwMjgzMiA1MC4wNDMxMjk4OCAtNDcuMDU1MjQ0MTQgNDkuMTQwOTQ3MjcgLTQ2LjExMzc2OTUzIDQ4LjIxMTQyNTc4IEMtNDMuOTcwNTA4MzQgNDYuMTg2NjI3MzkgLTQzLjk3MDUwODM0IDQ2LjE4NjYyNzM5IC00MyA0NCBDLTQyLjM0IDQ0IC00MS42OCA0NCAtNDEgNDQgQy00MC42NDU1NDgxIDQzLjE1NTUwMjkzIC00MC42NDU1NDgxIDQzLjE1NTUwMjkzIC00MC4yODM5MzU1NSA0Mi4yOTM5NDUzMSBDLTM4LjcwMTkyODk0IDM5LjQ2NzQ1MDkgLTM2Ljc3MTM1OTkxIDM3LjU2Mzk1NDAxIC0zNC40NTcwMzEyNSAzNS4yOTY4NzUgQy0zMy41NDc1OTc2NiAzNC4zOTgzOTg0NCAtMzIuNjM4MTY0MDYgMzMuNDk5OTIxODcgLTMxLjcwMTE3MTg4IDMyLjU3NDIxODc1IEMtMzAuNzM4NjU0NjkgMzEuNjMyNDMwNjkgLTI5Ljc3NTc2MTgxIDMwLjY5MTAyNjQ1IC0yOC44MTI1IDI5Ljc1IEMtMjMuMjAwMjM3NDUgMjQuMjQyMzEzNzcgLTE3LjY2NDgwMDQ4IDE4Ljc2MTA5MDEyIC0xMi41NTI5Nzg1MiAxMi43ODIyMjY1NiBDLTEwLjE4MTI2NTMxIDEwLjA2MDQwNTA4IC03LjYzNzEyODUyIDcuNTI4MzM1MDYgLTUuMDYyNSA1IEMtNC41Njk0MzM1OSA0LjUxMTQ0NTMxIC00LjA3NjM2NzE5IDQuMDIyODkwNjIgLTMuNTY4MzU5MzggMy41MTk1MzEyNSBDLTIuMzgxMjY3NzEgMi4zNDM5NjQ3NSAtMS4xOTA5OTUwMiAxLjE3MTYxMTc0IDAgMCBaICIgZmlsbD0iIzFGOUVEOSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoOTg4LDExOTEpIi8+CjxwYXRoIGQ9Ik0wIDAgQzEuNjU5NDk4OTEgMi4yNjU5MTExNiAzLjEyMzM0NDY2IDQuNDc1NjI1MTkgNC41NjI1IDYuODc1IEM3LjQyMzkzMDYyIDExLjcwNTE4NjkzIDcuNDIzOTMwNjIgMTEuNzA1MTg2OTMgMTEgMTYgQzEwLjM0IDE2IDkuNjggMTYgOSAxNiBDOSAxNi42NiA5IDE3LjMyIDkgMTggQzguNTI0MzM1OTQgMTguMjQ0OTIxODggOC4wNDg2NzE4NyAxOC40ODk4NDM3NSA3LjU1ODU5Mzc1IDE4Ljc0MjE4NzUgQzEuODI1MTgyNzggMjEuODA0MjMwMTkgLTMuNTYyMjAwMzMgMjUuMzEwNDQxODEgLTguOTQ3OTk4MDUgMjguOTM2NTIzNDQgQy0xMy41NjI2NjQyIDMyLjA0MzQyNzM4IC0xOC4yMDIyOTk0MiAzNS4xMDYwNTQwNSAtMjIuODc1IDM4LjEyNSBDLTIzLjU1OTA4OTM2IDM4LjU2NzA2Nzg3IC0yNC4yNDMxNzg3MSAzOS4wMDkxMzU3NCAtMjQuOTQ3OTk4MDUgMzkuNDY0NTk5NjEgQy0yOS4zNjMwNjYxNiA0Mi4zMTE5MzA1NiAtMzMuNzg3NjQ3MTggNDUuMTQ0MjI1NTggLTM4LjIxNDg0Mzc1IDQ3Ljk3MjY1NjI1IEMtMzkuMzA0OTA3MjMgNDguNjY5MjMzNCAtNDAuMzk0OTcwNyA0OS4zNjU4MTA1NSAtNDEuNTE4MDY2NDEgNTAuMDgzNDk2MDkgQy00My42NTEwNjE2MyA1MS40NDU3NDI0OSAtNDUuNzg0ODAyOTMgNTIuODA2ODIxNjcgLTQ3LjkxOTQzMzU5IDU0LjE2NjUwMzkxIEMtNTQuMDEyOTM0NjggNTguMDU2MTE4NTcgLTYwLjA1MjY0NzI2IDYyLjAxNjI2NDI4IC02Ni4wNTk4MTQ0NSA2Ni4wMzc4NDE4IEMtNzAuNzQ1Nzk1NiA2OS4xNjUwNzE3NiAtNzUuNDY2MTI2ODkgNzIuMjM5MDY4NDggLTgwLjE4NzUgNzUuMzEyNSBDLTgxLjE4MjE3Mjg1IDc1Ljk2MDU3NjE3IC04Mi4xNzY4NDU3IDc2LjYwODY1MjM0IC04My4yMDE2NjAxNiA3Ny4yNzYzNjcxOSBDLTkxLjEwNjA1NTEyIDgyLjQyMzk0NzEyIC05OS4wMjE3MTg1NSA4Ny41NTM5MTE2IC0xMDYuOTQ1MzEyNSA5Mi42NzE4NzUgQy0xMDkuMTEwMzg5OTQgOTQuMDcxMzU0NzEgLTExMS4yNzQwOTY3MyA5NS40NzI5MzM3NyAtMTEzLjQzNzUgOTYuODc1IEMtMTIxLjI3MDQ3NzY1IDEwMS45NTA1NTAyOSAtMTI5LjExMjg4NDY2IDEwNy4wMDg4MDE3NCAtMTM3IDExMiBDLTEzOS45MjE1MTYyMiAxMDkuMzQ1NzUxODIgLTE0MS45OTA2NzYxNSAxMDYuMjY1MjI0NTIgLTE0NC4xODc1IDEwMyBDLTE0NC45MDI5Mjk2OSAxMDEuOTQ4MTI1IC0xNDUuNjE4MzU5MzcgMTAwLjg5NjI1IC0xNDYuMzU1NDY4NzUgOTkuODEyNSBDLTE0OCA5NyAtMTQ4IDk3IC0xNDggOTQgQy0xNDUuNTM0OTI0NyA5Mi4xNjY0NDc3IC0xNDMuMTA4OTYwOTUgOTAuNTQyOTQ5NjcgLTE0MC41IDg4LjkzNzUgQy0xMzkuNzI5NzA0NTkgODguNDUxNDQyODcgLTEzOC45NTk0MDkxOCA4Ny45NjUzODU3NCAtMTM4LjE2NTc3MTQ4IDg3LjQ2NDU5OTYxIEMtMTM1Ljc4NDAxMDE4IDg1Ljk2NTEzNDQzIC0xMzMuMzkzNDIyOTIgODQuNDgwNzY1NSAtMTMxIDgzIEMtMTI4LjM1MzM5OCA4MS4zNTU0MDExNSAtMTI1LjcwNzkwMDEzIDc5LjcwOTAzMTIzIC0xMjMuMDYyNSA3OC4wNjI1IEMtMTIyLjA4MzYxODE2IDc3LjQ1NDg2ODE2IC0xMjIuMDgzNjE4MTYgNzcuNDU0ODY4MTYgLTEyMS4wODQ5NjA5NCA3Ni44MzQ5NjA5NCBDLTExNS4zMDU4Nzc2IDczLjIzMTEzNDcxIC0xMDkuNjQzMzMzOSA2OS40NjQxMjg1NSAtMTAzLjk4ODAzNzExIDY1LjY2OTkyMTg4IEMtOTUuODkxMjk0MTIgNjAuMjQxNjI5NDggLTg3LjcxMzYyNDAzIDU0Ljk0MDYwNjQxIC03OS41MzIyMjY1NiA0OS42NDExMTMyOCBDLTc1LjM1MTkwNzQ2IDQ2LjkzMTg4NjAzIC03MS4xNzYxNjIyMyA0NC4yMTU2Mjg2MiAtNjcgNDEuNSBDLTY1LjMyOTQ1MzExIDQwLjQxNDAyMjQ2IC02My42NTg4ODAyIDM5LjMyODA4NDk1IC02MS45ODgyODEyNSAzOC4yNDIxODc1IEMtNjEuMTYyNzk3ODUgMzcuNzA1NjE1MjMgLTYwLjMzNzMxNDQ1IDM3LjE2OTA0Mjk3IC01OS40ODY4MTY0MSAzNi42MTYyMTA5NCBDLTU3LjAyNjU2ODkgMzUuMDE3MjY3NDQgLTU0LjU2NjA1NTA3IDMzLjQxODczNDU1IC01Mi4xMDU0Njg3NSAzMS44MjAzMTI1IEMtNTAuNDY2MTI2OTEgMzAuNzU1MjM3NDcgLTQ4LjgyNjgwNDA0IDI5LjY5MDEzMzIxIC00Ny4xODc1IDI4LjYyNSBDLTQ2LjM3Njc2MDI1IDI4LjA5ODI1Njg0IC00NS41NjYwMjA1MSAyNy41NzE1MTM2NyAtNDQuNzMwNzEyODkgMjcuMDI4ODA4NTkgQy00MC4xNTU4NjQ0MyAyNC4wNTUyNjg5NSAtMzUuNTg0MTg2MjkgMjEuMDc2OTQxNCAtMzEuMDE1NjI1IDE4LjA5Mzc1IEMtMzAuMDAzNDY5MjQgMTcuNDMyOTQ0MzQgLTI4Ljk5MTMxMzQ4IDE2Ljc3MjEzODY3IC0yNy45NDg0ODYzMyAxNi4wOTEzMDg1OSBDLTI2LjAwNzg0MjcgMTQuODIzOTgxNiAtMjQuMDY3NTQ4NzcgMTMuNTU2MTE4ODcgLTIyLjEyNzY4NTU1IDEyLjI4NzU5NzY2IEMtMjAuMzMwMjQ3NDUgMTEuMTEzNzgwMjUgLTE4LjUzMTA0NzM4IDkuOTQyNjU1ODkgLTE2LjcyOTk4MDQ3IDguNzc0NDE0MDYgQy0xNC44MDY4MTM5NSA3LjUyNDQwNzQyIC0xMi44ODk3MDE1OSA2LjI2NTA2MTcyIC0xMC45NzcwNTA3OCA0Ljk5OTAyMzQ0IEMtOS41MDUzNDQyNCA0LjAzNjU3NzE1IC05LjUwNTM0NDI0IDQuMDM2NTc3MTUgLTguMDAzOTA2MjUgMy4wNTQ2ODc1IEMtNy4xMTY0NjcyOSAyLjQ2OTI5MTk5IC02LjIyOTAyODMyIDEuODgzODk2NDggLTUuMzE0Njk3MjcgMS4yODA3NjE3MiBDLTMgMCAtMyAwIDAgMCBaICIgZmlsbD0iIzRDQjJFMSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoOTM2LDEyMTkpIi8+CjxwYXRoIGQ9Ik0wIDAgQzYuNiAwIDEzLjIgMCAyMCAwIEMyMCA1OC4wOCAyMCAxMTYuMTYgMjAgMTc2IEMxMy40IDE3NiA2LjggMTc2IDAgMTc2IEMwIDExNy45MiAwIDU5Ljg0IDAgMCBaICIgZmlsbD0iI0ZGRkZGRiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA0MCwxMTU1KSIvPgo8cGF0aCBkPSJNMCAwIEMxNy42MzQyMDA1MSAwIDMyLjgzMDk5NDQzIDYuODA5OTYyMzMgNDUuMzM5ODQzNzUgMTkuMTc1NzgxMjUgQzU4LjUxNzMwOTYyIDMzLjE2NTk1NDI3IDYyLjYwMjc0NDI0IDQ4LjQxMDA5NjQyIDYyLjI0MjE4NzUgNjcuMTIxMDkzNzUgQzYxLjU5NjQ3MTMyIDgzLjg0MjU4NTUyIDUzLjcwMzg2OTAyIDk4LjMyMDM4NjI1IDQxLjYzMjMyNDIyIDEwOS41ODgzNzg5MSBDMjkuNzM0MjQzNTkgMTE5Ljg3Nzc0NTA4IDE2LjQzMTI2NTQgMTI0IDEgMTI0IEMxIDExNy40IDEgMTEwLjggMSAxMDQgQzIuNTI2MjUgMTAzLjgxNDM3NSA0LjA1MjUgMTAzLjYyODc1IDUuNjI1IDEwMy40Mzc1IEMxNC43OTc5MjUwMyAxMDEuNzU0NjExOTQgMjUuMTQ2MjUxOTIgOTcuMzAxNzQ3MjEgMzEuNDcyNjU2MjUgOTAuMjE4NzUgQzM4LjgzNzA0NjcyIDc5LjUyMDYwNzMzIDQyLjA3ODc5ODA4IDY4Ljk3NjM5OTcyIDQxIDU2IEMzOS4yOTQ1MTc3NyA0Ny4xODQ5MTcxNyAzNi4xOTY4MDEyOSA0MC40ODk0NjMzNiAzMCAzNCBDMjkuMTA0NzQ2MDkgMzMuMDQ0ODA0NjkgMjkuMTA0NzQ2MDkgMzMuMDQ0ODA0NjkgMjguMTkxNDA2MjUgMzIuMDcwMzEyNSBDMjAuMDA2OTIxMjMgMjQuMTQxMDYwOSAxMS4xNTMxODcwMyAyMi4xMTUzMTg3IDAgMjEgQzAgMTQuMDcgMCA3LjE0IDAgMCBaICIgZmlsbD0iI0ZGRkZGRiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA3OCwxMTUxKSIvPgo8cGF0aCBkPSJNMCAwIEM2Ljg5NDUyNDg4IDQuODU0NDMzNzQgMTAuMzY0MDc0NjggMTAuMDkyMjI0MDMgMTMgMTggQzE0LjAyMTExNDc0IDI4LjQwMDc4MzAxIDEyLjQyNTc1Nzc4IDM1LjQxMzExMTg1IDUuOTQ1MzEyNSA0My41OTM3NSBDNC40Mzc2MDIxOSA0NS4zMjU3OTA5IDIuODgwMTgyNyA0Ny4wMTU3NTI2IDEuMjc3MzQzNzUgNDguNjYwMTU2MjUgQy0wLjk5MTc1MTg0IDUwLjg4Nzg3MDQ5IC0wLjk5MTc1MTg0IDUwLjg4Nzg3MDQ5IC0yLjYyMTA5Mzc1IDUzLjE4MzU5Mzc1IEMtNS4yMTgxMjMyNSA1Ni4yNzg4NTQzMyAtNy4yOTkwNzI0OCA1Ny43OTYyMDcwMiAtMTEuNDAwMzkwNjIgNTguMjg3NTk3NjYgQy0xNy42MDk3OTY5OCA1OC41OTcxOTI3OSAtMjMuNzk4MzA4NzIgNTguMzgyNTYwOTUgLTMwIDU4IEMtMjYuNjEyNDYzNTcgNTMuOTc1NzMwMTkgLTIzLjE5MDQ0ODY0IDUwLjA2NzUyNTQ5IC0xOS40Mzc1IDQ2LjM3NSBDLTE4LjY2OTIxODc1IDQ1LjYxNDQ1MzEyIC0xNy45MDA5Mzc1IDQ0Ljg1MzkwNjI1IC0xNy4xMDkzNzUgNDQuMDcwMzEyNSBDLTE1LjQ3MDQ4NDg1IDQyLjQ2MTc3MjE3IC0xMy44Mjk0MjcyOSA0MC44NTU0NDAwMiAtMTIuMTg3NSAzOS4yNSBDLTcuMzU2MDkwODcgMzQuMjgwNTUwNjEgLTMuOTkzMTM1NzEgMzAuMDgyNzc1MzcgLTMuNjg3NSAyMyBDLTMuNzg1OTcxMzEgMTkuMjcyMTU3NjIgLTQuNjQxMzQ0MjQgMTYuOTcwMTU5MTEgLTcgMTQgQy0xMS4yNTEwMTkgMTEuMTY1OTg3MzMgLTE1LjAwOTkzODQ3IDExLjM2MTI3MjEyIC0yMCAxMiBDLTI0LjgyMzgwOTY5IDE0LjY2ODQ5MDQ2IC0yNS4zODI2MTI0NyAxNi43NjUyMjQ5MyAtMjggMjIgQy0zMi45NSAyMiAtMzcuOSAyMiAtNDMgMjIgQy00Mi41OTA1NTMyNSAxMy4yNjUxMzU5NCAtNDAuMTM4OTE5OTEgNy43MTk4MjkwMyAtMzMuNzUgMS42ODc1IEMtMjQuMDk0NDExMzcgLTUuOTMzMTQ3MzcgLTEwLjM1NjU0NjkxIC02LjUzNzkzMTg1IDAgMCBaICIgZmlsbD0iI0ZGRkZGRiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTE5OCwxMDkyKSIvPgo8cGF0aCBkPSJNMCAwIEMyMC40NiAwIDQwLjkyIDAgNjIgMCBDNjIgNS4yOCA2MiAxMC41NiA2MiAxNiBDNDEuNTQgMTYgMjEuMDggMTYgMCAxNiBDMCAxMC43MiAwIDUuNDQgMCAwIFogIiBmaWxsPSIjRkZGRkZGIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMTU5LDExNjEpIi8+Cjwvc3ZnPg==" alt="menderpeter Logo" style="height:96px; width:auto; margin-top:-16px;">
+  <span style="display:flex; flex-direction:column; line-height:1.3;">
+    <span style="font-size:1.5rem; font-weight:700; letter-spacing:1px;">menderpeter</span>
+    <span style="font-size:0.7rem; font-weight:400; letter-spacing:3px; text-transform:uppercase; opacity:0.7;">Mental &amp; Businesscoaching</span>
+  </span>
+</h1>
+  <div class="header-actions">
+    <button onclick="exportJSON()">Daten speichern</button>
+    <button onclick="document.getElementById('importXlsx').click()">XLSX importieren</button>
+    <button onclick="printOverview()">Drucken / PDF</button>
+    <input type="file" id="importXlsx" accept=".xlsx,.xls" style="display:none" onchange="importXLSX(event)">
+  </div>
+</div>
+
+<div class="container">
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="nav-item active" onclick="goToSection(0)"><span class="nav-number">1</span>Klientendaten</div>
+  <div class="nav-item" onclick="goToSection(1)"><span class="nav-number">2</span>Huna Grundannahmen</div>
+  <div class="nav-item" onclick="goToSection(2)"><span class="nav-number">3</span>SMARTe Zieldefinition</div>
+  <div class="nav-item" onclick="goToSection(3)"><span class="nav-number">4</span>VAKOG Wahrnehmung</div>
+  <div class="nav-item" onclick="goToSection(4)"><span class="nav-number">5</span>Antreibertest</div>
+  <div class="nav-item" onclick="goToSection(5)"><span class="nav-number">6</span>Förderliche Gedanken</div>
+  <div class="nav-item" onclick="goToSection(6)"><span class="nav-number">7</span>Hinderliche Gedanken</div>
+  <div class="nav-item" onclick="goToSection(7)"><span class="nav-number">8</span>Mein inneres Team</div>
+  <div class="nav-item" onclick="goToSection(8)"><span class="nav-number">9</span>Mein Krafttier</div>
+  <div class="nav-item" onclick="goToSection(9)"><span class="nav-number">10</span>Byron Katie</div>
+  <div class="nav-item" onclick="goToSection(10)"><span class="nav-number">11</span>Kreis der Gewohnheit</div>
+</nav>
+
+<!-- Main Content -->
+<div class="main">
+
+<!-- ============================================================ -->
+<!-- SEKTION 1: Klientendaten -->
+<!-- ============================================================ -->
+<div class="section active" id="sec-0">
+  <h2 class="section-title">Klientendaten</h2>
+  <p class="section-subtitle">Grundlegende Informationen zum Klienten und zum Coaching-Prozess.</p>
+
+  <div class="card">
+    <div class="card-title">Persönliche Daten</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Vorname</label>
+        <input type="text" id="klient_vorname" placeholder="Vorname">
+      </div>
+      <div class="form-group">
+        <label>Nachname</label>
+        <input type="text" id="klient_nachname" placeholder="Nachname">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>E-Mail</label>
+        <input type="email" id="klient_email" placeholder="email@beispiel.de">
+      </div>
+      <div class="form-group">
+        <label>Telefon</label>
+        <input type="tel" id="klient_telefon" placeholder="+43 ...">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Geburtsdatum</label>
+        <input type="text" id="klient_geburtsdatum" placeholder="TT.MM.JJJJ">
+      </div>
+      <div class="form-group">
+        <label>Beruf / Tätigkeit</label>
+        <input type="text" id="klient_beruf" placeholder="Beruf oder Tätigkeit">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Coaching-Rahmen</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Datum Erstgespräch</label>
+        <input type="text" id="coaching_erstgespraech" placeholder="TT.MM.JJJJ">
+      </div>
+      <div class="form-group">
+        <label>Coach</label>
+        <input type="text" id="coaching_coach" placeholder="Name des Coaches">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Anlass / Thema</label>
+      <textarea id="coaching_anlass" placeholder="Was führt den Klienten zum Coaching? Was ist das übergeordnete Thema?"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Erwartungen an das Coaching</label>
+      <textarea id="coaching_erwartungen" placeholder="Was erwartet sich der Klient vom Coaching-Prozess?"></textarea>
+    </div>
+  </div>
+
+  <div class="nav-buttons">
+    <div></div>
+    <button class="btn btn-primary" onclick="goToSection(1)">Weiter &rarr;</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SEKTION 2: Huna Grundannahmen -->
+<!-- ============================================================ -->
+<div class="section" id="sec-1">
+  <h2 class="section-title">Huna Grundannahmen</h2>
+  <p class="section-subtitle">Die 7 Grundsätze der hawaiianischen Huna-Philosophie. Formuliere zu jedem Grundsatz einen persönlichen Satz.</p>
+
+  <div class="card huna-card">
+    <div class="huna-name">IKE</div>
+    <div class="huna-meaning">Die Welt ist das, wofür du sie hältst.</div>
+    <div class="form-group">
+      <label>Dein persönlicher Satz dazu</label>
+      <textarea id="huna_ike" placeholder="Was bedeutet dieser Grundsatz für dich?"></textarea>
+    </div>
+  </div>
+
+  <div class="card huna-card">
+    <div class="huna-name">KALA</div>
+    <div class="huna-meaning">Es gibt keine Grenzen.</div>
+    <div class="form-group">
+      <label>Dein persönlicher Satz dazu</label>
+      <textarea id="huna_kala" placeholder="Was bedeutet dieser Grundsatz für dich?"></textarea>
+    </div>
+  </div>
+
+  <div class="card huna-card">
+    <div class="huna-name">MAKIA</div>
+    <div class="huna-meaning">Energie folgt der Aufmerksamkeit.</div>
+    <div class="form-group">
+      <label>Dein persönlicher Satz dazu</label>
+      <textarea id="huna_makia" placeholder="Was bedeutet dieser Grundsatz für dich?"></textarea>
+    </div>
+  </div>
+
+  <div class="card huna-card">
+    <div class="huna-name">MANAWA</div>
+    <div class="huna-meaning">Alle Kraft liegt im Augenblick.</div>
+    <div class="form-group">
+      <label>Dein persönlicher Satz dazu</label>
+      <textarea id="huna_manawa" placeholder="Was bedeutet dieser Grundsatz für dich?"></textarea>
+    </div>
+  </div>
+
+  <div class="card huna-card">
+    <div class="huna-name">ALOHA</div>
+    <div class="huna-meaning">Liebe ist der Schlüssel zu allem.</div>
+    <div class="form-group">
+      <label>Dein persönlicher Satz dazu</label>
+      <textarea id="huna_aloha" placeholder="Was bedeutet dieser Grundsatz für dich?"></textarea>
+    </div>
+  </div>
+
+  <div class="card huna-card">
+    <div class="huna-name">MANA</div>
+    <div class="huna-meaning">Alle Menschen haben Kraft und Macht.</div>
+    <div class="form-group">
+      <label>Dein persönlicher Satz dazu</label>
+      <textarea id="huna_mana" placeholder="Was bedeutet dieser Grundsatz für dich?"></textarea>
+    </div>
+  </div>
+
+  <div class="card huna-card">
+    <div class="huna-name">PONO</div>
+    <div class="huna-meaning">Wahrheit, Ausgewogenheit, Balance und Harmonie.</div>
+    <div class="form-group">
+      <label>Dein persönlicher Satz dazu</label>
+      <textarea id="huna_pono" placeholder="Was bedeutet dieser Grundsatz für dich?"></textarea>
+    </div>
+  </div>
+
+  <div class="nav-buttons">
+    <button class="btn btn-secondary" onclick="goToSection(0)">&larr; Zurück</button>
+    <button class="btn btn-primary" onclick="goToSection(2)">Weiter &rarr;</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SEKTION 3: SMARTe Zieldefinition -->
+<!-- ============================================================ -->
+<div class="section" id="sec-2">
+  <h2 class="section-title">SMARTe Zieldefinition</h2>
+  <p class="section-subtitle">Definiere dein Ziel nach dem SMART-Ansatz. Es sollte konkret, messbar, attraktiv, realistisch und zeitgebunden sein.</p>
+
+  <div class="card">
+    <div class="card-title">SMART-Kriterien</div>
+    <div class="form-group">
+      <label>Spezifisch (S): Was genau soll erreicht werden?</label>
+      <textarea id="smart_spezifisch" placeholder="Sei konkret und detailliert..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Messbar (M): Wie erkennst du, dass das Ziel erreicht ist?</label>
+      <textarea id="smart_messbar" placeholder="Anhand welcher Kriterien, Zahlen oder Beobachtungen?"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Attraktiv (A): Wofür willst du das erreichen?</label>
+      <textarea id="smart_attraktiv" placeholder="Was ist deine Motivation? Was reizt dich daran?"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Realistisch (R): Ist dieses Ziel realistisch erreichbar?</label>
+      <textarea id="smart_realistisch" placeholder="Welche Ressourcen hast du? Wo sind die Hürden?"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Zeitgebunden (T): Bis wann soll es erreicht sein?</label>
+      <input type="text" id="smart_zeitgebunden" placeholder="TT.MM.JJJJ">
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Zielformulierung</div>
+    <div class="form-group">
+      <label>Formuliere dein Gesamtziel in einem Satz:</label>
+      <textarea id="smart_zusammenfassung" placeholder="Mein Ziel ist..."></textarea>
+    </div>
+  </div>
+
+  <div class="nav-buttons">
+    <button class="btn btn-secondary" onclick="goToSection(1)">&larr; Zurück</button>
+    <button class="btn btn-primary" onclick="goToSection(3)">Weiter &rarr;</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SEKTION 4: VAKOG Wahrnehmung -->
+<!-- ============================================================ -->
+<div class="section" id="sec-3">
+  <h2 class="section-title">VAKOG -- Wahrnehmungskanäle</h2>
+  <p class="section-subtitle">Das VAKOG-Modell bildet die 5 Sinneskanäle ab: Visuell, Auditiv, Kinästhetisch, Gustatorisch, Olfaktorisch. Kreuze die Wahrnehmungen an, die du mit jedem Wort verbindest. Mehrfach-Ankreuzungen sind erwünscht.</p>
+
+  <div class="card">
+    <table class="vakog-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Begriff</th>
+          <th title="Visuell (Sehen)">V</th>
+          <th title="Auditiv (Hören)">A</th>
+          <th title="Kinästhetisch (Spüren)">K</th>
+          <th title="Gustatorisch (Schmecken)">G</th>
+          <th title="Olfaktorisch (Riechen)">O</th>
+        </tr>
+      </thead>
+      <tbody id="vakog-body"></tbody>
+    </table>
+    <div style="margin-top:20px;">
+      <strong>Deine Ergebnisse:</strong>
+      <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:10px; margin-top:10px; font-size:0.9rem;">
+        <div><strong>V:</strong> <span id="vakog-sum-v">0</span></div>
+        <div><strong>A:</strong> <span id="vakog-sum-a">0</span></div>
+        <div><strong>K:</strong> <span id="vakog-sum-k">0</span></div>
+        <div><strong>G:</strong> <span id="vakog-sum-g">0</span></div>
+        <div><strong>O:</strong> <span id="vakog-sum-o">0</span></div>
+      </div>
+    </div>
+    <div id="vakog-result" style="display:none; margin-top:20px; padding:16px; background:#e6f2fa; border-radius:8px; border-left:4px solid #1D9DD9;">
+      <strong>Dein dominanter Wahrnehmungskanal:</strong>
+      <div id="vakog-result-text" style="margin-top:6px; color:var(--primary);"></div>
+    </div>
+  </div>
+
+  <div class="nav-buttons">
+    <button class="btn btn-secondary" onclick="goToSection(2)">&larr; Zurück</button>
+    <button class="btn btn-primary" onclick="goToSection(4)">Weiter &rarr;</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SEKTION 5: Antreibertest -->
+<!-- ============================================================ -->
+<div class="section" id="sec-4">
+  <h2 class="section-title">Antreibertest</h2>
+  <p class="section-subtitle">Der Antreibertest zeigt deine inneren treibenden Kräfte. Antworte auf jede Aussage mit 2 (stimme zu), 1 (teils-teils) oder 0 (stimme nicht zu).</p>
+
+  <div class="card">
+    <div id="antreiber-questions"></div>
+    <button class="btn-add" onclick="calcAntreiber()">Ergebnis berechnen</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Deine Antreiber-Ergebnisse</div>
+    <div class="result-grid" style="grid-template-columns: repeat(4, 1fr);">
+      <div class="result-card" id="res-perfekt">
+        <div class="score" id="score-perfekt">0</div>
+        <div class="label">Sei perfekt</div>
+        <div class="max">7+10+13+15+33</div>
+      </div>
+      <div class="result-card" id="res-beliebt">
+        <div class="score" id="score-beliebt">0</div>
+        <div class="label">Sei beliebt</div>
+        <div class="max">12+17+21+23+27</div>
+      </div>
+      <div class="result-card" id="res-stark">
+        <div class="score" id="score-stark">0</div>
+        <div class="label">Sei stark</div>
+        <div class="max">1+19+25+31+34</div>
+      </div>
+      <div class="result-card" id="res-streng">
+        <div class="score" id="score-streng">0</div>
+        <div class="label">Streng dich an</div>
+        <div class="max">3+6+16+22+32</div>
+      </div>
+      <div class="result-card" id="res-beeil">
+        <div class="score" id="score-beeil">0</div>
+        <div class="label">Sei schnell</div>
+        <div class="max">5+9+14+20+29</div>
+      </div>
+      <div class="result-card" id="res-hut">
+        <div class="score" id="score-hut">0</div>
+        <div class="label">Sei auf der Hut</div>
+        <div class="max">4+11+28+30+35</div>
+      </div>
+      <div class="result-card" id="res-kannnicht">
+        <div class="score" id="score-kannnicht">0</div>
+        <div class="label">Ich kann nicht</div>
+        <div class="max">2+8+18+24+26</div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;">
+      <div class="card-title" style="margin-bottom:12px;">Interpretation der Antreiber</div>
+      <p style="font-size:0.88rem; color:var(--text-light); margin-bottom:16px;">Klicke auf deinen stärksten Antreiber, um Stärken, Schwächen, Empfehlungen und förderliche Einstellung zu lesen.</p>
+
+      <div class="antreiber-interpretation visible" data-antreiber="perfekt" style="margin-bottom:10px; display:block; cursor:pointer;" onclick="toggleInterpretation(this)">
+        <div class="interp-header">Sei perfekt <span style="float:right; font-weight:400;">+</span></div>
+        <div class="interp-grid" style="display:none;">
+          <div class="interp-cell"><div class="interp-label">Stärken</div><div class="interp-text">Genauigkeit, Blick fürs Detail, strebt nach hoher Qualität.</div></div>
+          <div class="interp-cell"><div class="interp-label">Schwächen</div><div class="interp-text">Arbeiten werden nicht abgeschlossen, Fehler sind gefürchtet. Die Richtschnur dafür, wann etwas „gut genug" ist, fehlt.</div></div>
+          <div class="interp-cell" style="border-bottom:none;"><div class="interp-label">Empfehlungen</div><div class="interp-text">Machen Sie sich bewusst, dass Menschen (auch Sie selbst) nicht perfekt sein können. Setzen Sie sich realistische Standards für Leistung und Genauigkeit. Begreifen Sie Fehler als Lernchance.</div></div>
+          <div class="interp-cell" style="border-bottom:none;"><div class="interp-label">Förderliche Einstellung</div><div class="interp-text">Gut ist gut genug. Es ist in Ordnung Fehler zu machen. Ein gutes Pferd springt nur so hoch, wie es springen muss.</div></div>
+        </div>
+      </div>
+
+      <div class="antreiber-interpretation visible" data-antreiber="beliebt" style="margin-bottom:10px; display:block; cursor:pointer;" onclick="toggleInterpretation(this)">
+        <div class="interp-header">Sei beliebt <span style="float:right; font-weight:400;">+</span></div>
+        <div class="interp-grid" style="display:none;">
+          <div class="interp-cell"><div class="interp-label">Stärken</div><div class="interp-text">Gutes Einfühlungsvermögen, Höflichkeit, Harmonie.</div></div>
+          <div class="interp-cell"><div class="interp-label">Schwächen</div><div class="interp-text">Scheut Konflikte und schlechte Stimmung genauso wie nicht dazuzugehören oder abgelehnt zu werden.</div></div>
+          <div class="interp-cell" style="border-bottom:none;"><div class="interp-label">Empfehlungen</div><div class="interp-text">Fangen Sie an, anderen Fragen zu stellen, statt zu raten, was diese wollen. Üben Sie es, NEIN zu sagen und auszusprechen, was Ihnen nicht gefällt. Setzen Sie freundlich und bestimmt Grenzen.</div></div>
+          <div class="interp-cell" style="border-bottom:none;"><div class="interp-label">Förderliche Einstellung</div><div class="interp-text">Die Erwartungen anderer sind die Erwartungen anderer. Ich darf NEIN sagen.</div></div>
+        </div>
+      </div>
+
+      <div class="antreiber-interpretation visible" data-antreiber="stark" style="margin-bottom:10px; display:block; cursor:pointer;" onclick="toggleInterpretation(this)">
+        <div class="interp-header">Sei stark <span style="float:right; font-weight:400;">+</span></div>
+        <div class="interp-grid" style="display:none;">
+          <div class="interp-cell"><div class="interp-label">Stärken</div><div class="interp-text">Hohes Durchsetzungsvermögen, Belastbarkeit.</div></div>
+          <div class="interp-cell"><div class="interp-label">Schwächen</div><div class="interp-text">Nimmt auch bei hoher Arbeitsbelastung keine Hilfe an, kann schwer bis gar nicht im Team arbeiten.</div></div>
+          <div class="interp-cell" style="border-bottom:none;"><div class="interp-label">Empfehlungen</div><div class="interp-text">Schaffen Sie sich Puffer, sodass Sie Ihre Arbeitsbelastung überwachen können. Bitten Sie andere Menschen um Hilfe. Beobachten Sie, wie sich Ihre Beziehungen verbessern, wenn Sie sich von anderen helfen lassen.</div></div>
+          <div class="interp-cell" style="border-bottom:none;"><div class="interp-label">Förderliche Einstellung</div><div class="interp-text">Ein Team ist mehr als die Summe seiner Teile. Ich bin offen und drücke meine Wünsche aus.</div></div>
+        </div>
+      </div>
+
+      <div class="antreiber-interpretation visible" data-antreiber="beeil" style="margin-bottom:10px; display:block; cursor:pointer;" onclick="toggleInterpretation(this)">
+        <div class="interp-header">Sei schnell <span style="float:right; font-weight:400;">+</span></div>
+        <div class="interp-grid" style="display:none;">
+          <div class="interp-cell"><div class="interp-label">Stärken</div><div class="interp-text">Hohe Auffassungsgabe, Flexibilität, ergreift Chancen.</div></div>
+          <div class="interp-cell"><div class="interp-label">Schwächen</div><div class="interp-text">Läuft Gefahr sich zu verzetteln, oberflächlich, kann zeitlich wie inhaltlich keine Schwerpunkte setzen, wenig Zeit für sich selbst.</div></div>
+          <div class="interp-cell" style="border-bottom:none;"><div class="interp-label">Empfehlungen</div><div class="interp-text">Planen Sie Ihre Arbeit mit Zwischenzielen. Konzentrieren Sie sich darauf, anderen sorgfältig zuzuhören, bis sie aufhören zu sprechen. Praktizieren Sie regelmäßige STOPs. Holen Sie sich Rückmeldung für Genauigkeit.</div></div>
+          <div class="interp-cell" style="border-bottom:none;"><div class="interp-label">Förderliche Einstellung</div><div class="interp-text">Ich darf mir die Zeit nehmen, die ich brauche. Rom wurde auch nicht an einem Tag erbaut.</div></div>
+        </div>
+      </div>
+
+      <div class="antreiber-interpretation visible" data-antreiber="streng" style="margin-bottom:10px; display:block; cursor:pointer;" onclick="toggleInterpretation(this)">
+        <div class="interp-header">Streng dich an <span style="float:right; font-weight:400;">+</span></div>
+        <div class="interp-grid" style="display:none;">
+          <div class="interp-cell"><div class="interp-label">Stärken</div><div class="interp-text">Begeisterungsfähigkeit, hohes Engagement, Enthusiasmus.</div></div>
+          <div class="interp-cell"><div class="interp-label">Schwächen</div><div class="interp-text">Möchte überall zu den Besten gehören und investiert Unmengen von Energie in sämtliche Bereiche. Es zählt, was mit Mühe und Anstrengung erreicht wurde.</div></div>
+          <div class="interp-cell" style="border-bottom:none;"><div class="interp-label">Empfehlungen</div><div class="interp-text">Machen Sie sich einen Plan inklusive Beendigung der Aufgabe und halten Sie sich daran. Prüfen Sie die Anforderungen einer Aufgabe, sodass Sie sicher sein können, nur das Vereinbarte zu tun. Machen Sie sich eine Checkliste, um nichts Wesentliches zu übersehen.</div></div>
+          <div class="interp-cell" style="border-bottom:none;"><div class="interp-label">Förderliche Einstellung</div><div class="interp-text">Es darf auch manchmal leicht gehen. Ich mache es gut und habe Erfolg.</div></div>
+        </div>
+      </div>
+
+      <div class="antreiber-interpretation visible" data-antreiber="hut" style="margin-bottom:10px; display:block; cursor:pointer;" onclick="toggleInterpretation(this)">
+        <div class="interp-header">Sei auf der Hut <span style="float:right; font-weight:400;">+</span></div>
+        <div class="interp-grid" style="display:none;">
+          <div class="interp-cell"><div class="interp-label">Stärken</div><div class="interp-text">Strukturiert, gutes Risikomanagement, Blick aufs Ganze, sehr vorausschauend.</div></div>
+          <div class="interp-cell"><div class="interp-label">Schwächen</div><div class="interp-text">Kann schwer mit ungeplanten, unvorhergesehenen Ereignissen umgehen, kann schwer Kontrolle abgeben.</div></div>
+          <div class="interp-cell" style="border-bottom:none;"><div class="interp-label">Empfehlungen</div><div class="interp-text">Trauen Sie sich, unwichtige Dinge auf sich zukommen zu lassen. Stärken Sie Ihr Vertrauen in sich selbst und in andere. Machen Sie sich bewusst, dass es unmöglich ist, alles zu kontrollieren.</div></div>
+          <div class="interp-cell" style="border-bottom:none;"><div class="interp-label">Förderliche Einstellung</div><div class="interp-text">Aus Ungeplantem kann Großartiges entstehen. Kontrolle ist gut, Vertrauen auch.</div></div>
+        </div>
+      </div>
+
+      <div class="antreiber-interpretation visible" data-antreiber="kannnicht" style="margin-bottom:10px; display:block; cursor:pointer;" onclick="toggleInterpretation(this)">
+        <div class="interp-header">Ich kann nicht <span style="float:right; font-weight:400;">+</span></div>
+        <div class="interp-grid" style="display:none;">
+          <div class="interp-cell"><div class="interp-label">Stärken</div><div class="interp-text">Achtet auf sich und andere, nimmt gut Hilfe an, kann Grenzen ausloten.</div></div>
+          <div class="interp-cell"><div class="interp-label">Schwächen</div><div class="interp-text">Scheut jegliche Veränderung, sieht Erneuerungen als Gefahr, traut sich selbst wenig zu.</div></div>
+          <div class="interp-cell" style="border-bottom:none;"><div class="interp-label">Empfehlungen</div><div class="interp-text">Finden Sie Vorteile von Veränderungen. Planen Sie kleine Veränderungen in Ihren Alltag ein. Fokussieren Sie sich auf Ihre Ressourcen und Potenziale.</div></div>
+          <div class="interp-cell" style="border-bottom:none;"><div class="interp-label">Förderliche Einstellung</div><div class="interp-text">Um andere Küsten zu sehen, muss ich das Ufer verlassen. Magie beginnt außerhalb der Komfortzone.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-buttons">
+    <button class="btn btn-secondary" onclick="goToSection(3)">&larr; Zurück</button>
+    <button class="btn btn-primary" onclick="goToSection(5)">Weiter &rarr;</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SEKTION 6: Förderliche Gedanken -->
+<!-- ============================================================ -->
+<div class="section" id="sec-5">
+  <h2 class="section-title">Förderliche Gedanken</h2>
+  <p class="section-subtitle">Schreibe Gedanken und Überzeugungen auf, die dir helfen, dein Ziel zu erreichen.</p>
+
+  <div class="card">
+    <div class="card-title">Meine förderlichen Gedanken</div>
+    <div class="dynamic-list" id="förderliche-list">
+      <div class="list-item">
+        <span style="min-width:24px; font-weight:700; color:var(--accent); padding-top:10px;">1.</span>
+        <textarea class="förderlich-input" rows="2" placeholder="Ein förderlicher Gedanke ..."></textarea>
+        <button class="btn-remove" onclick="removeListItem(this)">X</button>
+      </div>
+    </div>
+    <button class="btn-add" onclick="addFoerderlich()">+ Gedanke hinzufügen</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Zusammenfassung</div>
+    <div class="form-group">
+      <label>Fasse deine förderlichen Gedanken zusammen:</label>
+      <textarea id="foerderliche_zusammenfassung" rows="4" placeholder="Zusammenfassung oder Affirmation..."></textarea>
+    </div>
+  </div>
+
+  <div class="nav-buttons">
+    <button class="btn btn-secondary" onclick="goToSection(4)">&larr; Zurück</button>
+    <button class="btn btn-primary" onclick="goToSection(6)">Weiter &rarr;</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SEKTION 7: Hinderliche Gedanken -->
+<!-- ============================================================ -->
+<div class="section" id="sec-6">
+  <h2 class="section-title">Hinderliche Gedanken</h2>
+  <p class="section-subtitle">Erkenne deine limitierenden Glaubenssätze und reformuliere sie in unterstützende Gedanken.</p>
+
+  <div class="card">
+    <div class="card-title">Hinderliche Gedanken und Umformulierungen</div>
+    <div class="dynamic-list" id="hinderliche-list">
+      <div class="thought-pair">
+        <textarea class="hinderlich-input" rows="2" placeholder="Hinderlicher Gedanke ..."></textarea>
+        <div class="arrow">&rarr;</div>
+        <textarea class="umformulierung-input" rows="2" placeholder="Umformulierung ..."></textarea>
+      </div>
+    </div>
+    <button class="btn-add" onclick="addHinderlich()">+ Gedanke hinzufügen</button>
+  </div>
+
+  <div class="nav-buttons">
+    <button class="btn btn-secondary" onclick="goToSection(5)">&larr; Zurück</button>
+    <button class="btn btn-primary" onclick="goToSection(7)">Weiter &rarr;</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SEKTION 8: Mein inneres Team -->
+<!-- ============================================================ -->
+<div class="section" id="sec-7">
+  <h2 class="section-title">Mein inneres Team</h2>
+  <p class="section-subtitle">Nach Schulz von Thun: Erkenne die verschiedenen Anteile in dir und wie sie dich unterstützen.</p>
+
+  <div class="card">
+    <div class="card-title">Meine Teammitglieder</div>
+    <div class="dynamic-list" id="team-list">
+    </div>
+  </div>
+
+  <div class="nav-buttons">
+    <button class="btn btn-secondary" onclick="goToSection(6)">&larr; Zurück</button>
+    <button class="btn btn-primary" onclick="goToSection(8)">Weiter &rarr;</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SEKTION 9: Mein Krafttier -->
+<!-- ============================================================ -->
+<div class="section" id="sec-8">
+  <h2 class="section-title">Mein Krafttier</h2>
+  <p class="section-subtitle">Wähle ein Tier, das deine Stärken und Ressourcen repräsentiert. Welche Eigenschaften trägt es in sich? Und welche davon hast du bereits?</p>
+
+  <div class="card">
+    <div class="form-group">
+      <label>Mein Krafttier heißt ...</label>
+      <input type="text" id="krafttier_name" placeholder="Tierart oder Name">
+    </div>
+    <div class="form-group">
+      <label>Eigenschaften dieses Tieres:</label>
+      <textarea id="krafttier_eigenschaften" rows="3" placeholder="Was sind die charakteristischen Merkmale dieses Tieres?"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Diese Eigenschaften habe ich bereits:</label>
+      <textarea id="krafttier_bereits" rows="3" placeholder="Welche Fähigkeiten besitze ich schon?"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Das möchte ich mir von diesem Tier aneignen:</label>
+      <textarea id="krafttier_aneignen" rows="3" placeholder="Welche neuen Fähigkeiten will ich entwickeln?"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Das brauche ich dafür:</label>
+      <textarea id="krafttier_brauche" rows="3" placeholder="Welche Unterstützung, Ressourcen oder Schritte sind notwendig?"></textarea>
+    </div>
+  </div>
+
+  <div class="nav-buttons">
+    <button class="btn btn-secondary" onclick="goToSection(7)">&larr; Zurück</button>
+    <button class="btn btn-primary" onclick="goToSection(9)">Weiter &rarr;</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SEKTION 10: Byron Katie -- The Work -->
+<!-- ============================================================ -->
+<div class="section" id="sec-9">
+  <h2 class="section-title">Byron Katie -- The Work</h2>
+  <p class="section-subtitle">Die 4 Fragen und die Umkehrung helfen dir, stressverursachende Gedanken zu hinterfragen und neue Perspektiven zu gewinnen.</p>
+
+  <div class="card">
+    <div class="card-title">Ausgangsaussagen</div>
+    <div class="form-group">
+      <label>1. Ein Gedanke oder Glaube, der dich momentan belastet:</label>
+      <input type="text" id="byron_aussage1" placeholder="z.B. Ich bin nicht gut genug.">
+    </div>
+    <div class="form-group">
+      <label>2. Ein Gedanke über jemand anderen:</label>
+      <input type="text" id="byron_aussage2" placeholder="z.B. Er versteht mich nicht.">
+    </div>
+    <div class="form-group">
+      <label>3. Ein Gedanke über dich selbst:</label>
+      <input type="text" id="byron_aussage3" placeholder="z.B. Ich bin zu langsam.">
+    </div>
+    <div class="form-group">
+      <label>4. Ein Gedanke, der Angst oder Furcht auslöst:</label>
+      <input type="text" id="byron_aussage4" placeholder="z.B. Es wird nichts mehr so wie vorher.">
+    </div>
+    <div class="form-group">
+      <label>5. Ein Wunsch oder eine Forderung:</label>
+      <input type="text" id="byron_aussage5" placeholder="z.B. Sie sollen mich endlich respektieren.">
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Work -- Die 4 Fragen</div>
+    <div class="byron-question">1. Ist das wahr?</div>
+    <div class="form-group">
+      <textarea id="byron_frage1" rows="3" placeholder="Beantworte diese Frage ausführlich..."></textarea>
+    </div>
+    <div class="byron-question">2. Kannst du mit absoluter Sicherheit wissen, dass das wahr ist?</div>
+    <div class="form-group">
+      <textarea id="byron_frage2" rows="3" placeholder="Beantworte diese Frage ausführlich..."></textarea>
+    </div>
+    <div class="byron-question">3. Wie reagierst du, wenn du diesen Gedanken glaubst?</div>
+    <div class="form-group">
+      <textarea id="byron_frage3" rows="3" placeholder="Welche Gefühle, Körperempfindungen und Verhaltensweisen?"></textarea>
+    </div>
+    <div class="byron-question">4. Wer wärst du ohne diesen Gedanken?</div>
+    <div class="form-group">
+      <textarea id="byron_frage4" rows="3" placeholder="Beschreibe dich selbst ohne diesen limitierenden Gedanken..."></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Die Umkehrung</div>
+    <div class="form-group">
+      <label>Umkehrung auf sich selbst:</label>
+      <textarea id="byron_umkehrung_selbst" rows="2" placeholder="z.B. Ich verstehe mich nicht."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Umkehrung auf die andere Person:</label>
+      <textarea id="byron_umkehrung_andere" rows="2" placeholder="z.B. Er versteht mich sehr wohl."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Umkehrung ins Gegenteil:</label>
+      <textarea id="byron_umkehrung_gegenteil" rows="2" placeholder="z.B. Ich bin sehr gut genug."></textarea>
+    </div>
+  </div>
+
+  <div class="nav-buttons">
+    <button class="btn btn-secondary" onclick="goToSection(8)">&larr; Zurück</button>
+    <button class="btn btn-primary" onclick="goToSection(10)">Weiter &rarr;</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SEKTION 11: Kreis der Gewohnheit -->
+<!-- ============================================================ -->
+<div class="section" id="sec-10">
+  <h2 class="section-title">Kreis der Gewohnheit</h2>
+  <p class="section-subtitle">Erkenne alte Gewohnheiten, die dich zurückhalten, und verpflichte dich zu neuen Erfahrungen.</p>
+
+  <div class="card">
+    <div class="card-title">Verantwortung und Commitment</div>
+    <div class="form-group">
+      <label>Was sind deine Ziele für diesen Coaching-Prozess? (Schreibe sie auf -- das ist ein Vertrag mit dir selbst!)</label>
+      <textarea id="gewohnheit_ziele" rows="4" placeholder="Meine Ziele für diesen Prozess sind..."></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Gewohnheiten, die mich zurückhalten</div>
+    <div class="dynamic-list" id="gewohnheit-list">
+      <div class="list-item">
+        <span style="min-width:24px; font-weight:700; color:var(--warning); padding-top:10px;">1.</span>
+        <textarea class="gewohnheit-input" rows="2" placeholder="Eine Gewohnheit, die dich zurückhält ..."></textarea>
+        <button class="btn-remove" onclick="removeListItem(this)">X</button>
+      </div>
+      <div class="list-item">
+        <span style="min-width:24px; font-weight:700; color:var(--warning); padding-top:10px;">2.</span>
+        <textarea class="gewohnheit-input" rows="2" placeholder="Eine Gewohnheit, die dich zurückhält ..."></textarea>
+        <button class="btn-remove" onclick="removeListItem(this)">X</button>
+      </div>
+      <div class="list-item">
+        <span style="min-width:24px; font-weight:700; color:var(--warning); padding-top:10px;">3.</span>
+        <textarea class="gewohnheit-input" rows="2" placeholder="Eine Gewohnheit, die dich zurückhält ..."></textarea>
+        <button class="btn-remove" onclick="removeListItem(this)">X</button>
+      </div>
+    </div>
+    <button class="btn-add" onclick="addGewohnheit()">+ Gewohnheit hinzufügen</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Neue Erfahrung</div>
+    <div class="form-group">
+      <label>Beschreibe dein Erlebnis, nachdem du eine neue Erfahrung gemacht hast.</label>
+      <span class="hint">Ich fühlte mich mutig, lebendig. Ich habe etwas gemacht, das ich normalerweise nicht mache. Es hat mir gefallen. Ich war spontan.</span>
+      <textarea id="gewohnheit_erfahrung" rows="4"></textarea>
+    </div>
+  </div>
+
+  <div class="nav-buttons">
+    <button class="btn btn-secondary" onclick="goToSection(9)">&larr; Zurück</button>
+    <div></div>
+  </div>
+</div>
+
+</div><!-- /main -->
+<!-- Annotations Panel -->
+<aside class="annotations-panel" id="annotations-panel">
+  <button class="mobile-anno-close" onclick="toggleMobileAnnotations()">Anmerkungen schliessen</button>
+  <div class="anno-header" onclick="toggleAnnoPanel()">
+    <span class="panel-toggle" id="panel-toggle">-</span>
+    <span>Anmerkungen</span>
+  </div>
+  <div class="anno-content" id="anno-content">
+
+  <!-- Anmerkungen Sektion 0: Klientendaten -->
+  <div class="anno-section active" id="anno-0">
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Erstgespräch</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">Das Erstgespräch dient dazu, eine vertrauensvolle Basis zu schaffen. Erfasse hier die wesentlichen Rahmendaten. Achte darauf, den Anlass möglichst in den Worten des Klienten festzuhalten.</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Erwartungsabgleich</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">Kläre früh, was der Klient vom Coaching erwartet und was realistisch leistbar ist. Das beugt Enttäuschungen vor und schafft einen klaren Rahmen für den gemeinsamen Prozess.</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <button class="anno-add-btn" onclick="addAnnotation(0)">+ Anmerkung hinzufügen</button>
+  </div>
+
+  <!-- Anmerkungen Sektion 1: Huna Grundannahmen -->
+  <div class="anno-section" id="anno-1">
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Huna-Philosophie</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">Die 7 Grundsätze stammen aus der hawaiianischen Huna-Tradition. Sie bilden das philosophische Fundament des Coaching-Prozesses. Der Klient soll jeden Grundsatz in eigene Worte fassen, um eine persönliche Verbindung herzustellen.</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Coaching-Tipp</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">Lass den Klienten zunächst spontan reagieren. Wenn er einen Grundsatz nicht versteht, gib ein Alltagsbeispiel. Die persönlichen Sätze können im Verlauf des Prozesses immer wieder herangezogen werden.</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">IKE: Die Welt ist das, wofür du sie hältst</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">&#8226; In welchen Bereichen unterscheidet sich dein Weltbild von dem Bild deiner Umwelt?<br>&#8226; Wer in deinem Umfeld hat dich schon einmal zu einer anderen Sichtweise animiert?<br>&#8226; Gab es schon einmal eine Situation, in der du im Nachhinein festgestellt hast, dass eine andere Sichtweise förderlicher gewesen wäre?<br>&#8226; Hast du schon mal zu einer neuen Sichtweise bei einem Freund / in der Familie / im Beruf beigetragen?</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">KALA: Es gibt keine Grenzen</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">&#8226; Kannst du dich an eine Situation erinnern, in der du deine eigenen Grenzen durchbrechen konntest?<br>&#8226; Gibt es jemanden in deinem Umfeld, der über seine Grenzen hinausgewachsen ist? Wenn ja, in welcher Situation?<br>&#8226; Welche Grenzen hast du dir früher mal gesetzt, mit denen du heute nichts mehr anfangen kannst?</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">MAKIA: Energie folgt der Aufmerksamkeit</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">&#8226; Hast du schon einmal erlebt, dass deine Aufmerksamkeit auf eine Sache / Person / dein Leben / Sichtweise / Energie verändert hat (egal ob positiv oder negativ)?<br>&#8226; Hast du dieses Gesetz schon einmal bei einer Person in deiner Umwelt erlebt?<br>&#8226; Gab es Situationen, wo du diese Wirkung schon einmal bewusst herbeigeführt hast?</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">MANAWA: Alle Kraft liegt im Augenblick</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">&#8226; Hast du bereits Erfahrung mit Achtsamkeitsübungen gemacht? Wenn ja, wie hat sich dies auf dein Wohlbefinden ausgewirkt?<br>&#8226; Kennst du Menschen in deinem Umfeld, auf die diese Beschreibung zutrifft? Fällt dir da eine bestimmte Situation ein, die diese Haltung charakterisiert?<br>&#8226; Gab es Momente in deinem Leben, in denen du ganz bei dir warst?</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">ALOHA: L(i)eben heißt, mit dir glücklich zu sein</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">&#8226; Welche Ereignisse haben dich bisher vollkommen erfüllt und glücklich gemacht?<br>&#8226; In welchen Situationen gelingt es dir, mit dir selbst glücklich zu sein? Wie fühlt sich das an?<br>&#8226; Kennst du eine Person aus deinem Umfeld, der du diese Haltung zuteilen würdest?</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">MANA: Alle Kraft kommt von Innen</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">&#8226; In welcher Situation deines Lebens hast du deine Eigenverantwortung erkannt und dementsprechend gehandelt?<br>&#8226; Kannst du dich an ein Erlebnis erinnern, bei dem du vom Opfer zum Gestalter wurdest?<br>&#8226; Fällt dir jemand aus deinem Umfeld ein, der absolute Macher-Qualitäten besitzt? Was zeichnet diese Person aus?</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">PONO: Effektivität ist das Maß aller Dinge</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">&#8226; Gab es Situationen in deinem Leben, in denen etwas funktioniert hat, ohne dass du es erwartet hättest?<br>&#8226; An welche besondere Wirkung kannst du dich erinnern, die du dir erträumt hast und die dann wirklich eingetreten ist?</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <button class="anno-add-btn" onclick="addAnnotation(1)">+ Anmerkung hinzufügen</button>
+  </div>
+
+  <!-- Anmerkungen Sektion 2: SMARTe Zieldefinition -->
+  <div class="anno-section" id="anno-2">
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">SMARTE Methode</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">Die Zielformulierung nach SMARTE ist das Herzstück des Prozesses. Achte darauf, dass das Ziel positiv formuliert ist (hin-zu, nicht weg-von). Jedes Kriterium muss einzeln geprüft werden, bevor die Zusammenfassung geschrieben wird.</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Häufige Fehler</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">Klienten formulieren oft zu vage (z.B. "glücklicher sein") oder negativ ("nicht mehr gestresst sein"). Hilf ihnen, konkrete, messbare und positiv formulierte Ziele zu entwickeln. Ein gutes Ziel lässt sich in einem Satz ausdrücken.</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Ziele richtig formulieren</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">NO GO: In der Zukunft formulieren "Ich werde"
+GO: Das Ziel so formulieren, als hätte ich es bereits erreicht, also in der Gegenwart.
+
+NO GO: Als Wunsch oder Willensabsicht formulieren "Ich will" / "Ich möchte"
+GO: Konkret und als Tatsache formulieren.
+
+NO GO: Als Gefühl formulieren "Ich fühle mich in 3 Monaten rundum glücklich"
+GO: Wenn ich aus dem Satz kein Bild zeichnen kann, ist es kein Ziel: "Ich gönne mir täglich eine Stunde Auszeit für Ruhe, Spiel oder Spass."
+
+NO GO: Den Prozess als Ziel beschreiben: "Innerhalb von 3 Monaten habe ich sämtliche Akten abgearbeitet"
+GO: Den gewünschten Endzustand beschreiben: "In drei Monaten ist mein Schreibtisch leer und aktenfrei."
+
+NO GO: Als Ziel bereits die förderliche Einstellung formulieren: "Ich erlaube mir mehr Zeit für mich."
+GO: Das Ziel muss immer als konkretes Bild darstellbar sein: "Ich habe täglich eine Stunde für mich, um mich zu regenerieren und Energie zu tanken."</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <button class="anno-add-btn" onclick="addAnnotation(2)">+ Anmerkung hinzufügen</button>
+  </div>
+
+  <!-- Anmerkungen Sektion 3: VAKOG -->
+  <div class="anno-section" id="anno-3">
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">VAKOG-Modell</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">VAKOG steht für die 5 Sinneskanäle ab: Visuell, Auditiv, Kinästhetisch, Gustatorisch, Olfaktorisch. Der Test zeigt, welcher Wahrnehmungskanal beim Klienten dominant ist. Das hilft, die Kommunikation im Coaching-Prozess darauf abzustimmen.</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Anwendung</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">Für visuelle Typen: Bilder, Diagramme und Visualisierungen einsetzen. Für auditive: Gespräche und Metaphern. Für kinaesthetische: Übungen, Bewegung, spürbare Erfahrungen. Mehrfach-Ankreuzungen pro Begriff sind möglich und erwünscht.</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <button class="anno-add-btn" onclick="addAnnotation(3)">+ Anmerkung hinzufügen</button>
+  </div>
+
+  <!-- Anmerkungen Sektion 4: Antreibertest -->
+  <div class="anno-section" id="anno-4">
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Innere Antreiber</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">Das Modell der inneren Antreiber stammt aus der Transaktionsanalyse. Die 5 Antreiber sind: "Sei perfekt", "Sei beliebt" (Mach es allen recht), "Sei stark", "Beeil dich" und "Streng dich an". Jeder Mensch trägt alle fünf in sich, aber in unterschiedlicher Ausprägung.</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Auswertung interpretieren</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">Hohe Werte zeigen dominante Antreiber, die das Verhalten unbewusst steuern. Der stärkste Antreiber ist oft die Quelle von Stress und inneren Konflikten. Ziel ist nicht die Beseitigung, aber das bewusste Erkennen und der flexible Umgang damit.</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Erlaubnisse</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">Zu jedem Antreiber gibt es eine "Erlaubnis":
+Sei perfekt: Du bist gut genug, so wie du bist.
+Sei beliebt: Du darfst auch an dich denken.
+Sei stark: Du darfst Gefühle zeigen.
+Beeil dich: Du darfst dir Zeit nehmen.
+Streng dich an: Du darfst es dir leicht machen.</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <button class="anno-add-btn" onclick="addAnnotation(4)">+ Anmerkung hinzufügen</button>
+  </div>
+
+  <!-- Anmerkungen Sektion 5: Förderliche Gedanken -->
+  <div class="anno-section" id="anno-5">
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Leitfrage</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text"><strong>„Wie müsste ich denken, damit ich mein Ziel erreiche?"</strong><br><br>Ist das gewünschte Ziel definiert, gilt es zu hinterfragen, ob das derzeitige Einstellungs-Set für das Erreichen des Zieles geeignet ist. Falls nicht, ist der nächste Schritt die passende, förderliche Einstellung zur Erreichung zu definieren:<br><br><em>„Wie müsste ich denken, damit ich in der gewünschten Situation / am Weg zum Ziel erfolgreicher, gelassener, stärker, mutiger, entspannter wäre...?"</em></div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Formulierungskriterien</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text"><strong>In der Gegenwart</strong><br>Um das gewünschte Ergebnis ab sofort zu ermöglichen.<br><br><strong>Klar &amp; präzise</strong><br>Auf den Punkt gebracht, sodass eine eindeutige Aufforderung erkennbar ist.<br><br><strong>In der ICH-Form</strong><br>Um dem Unterbewusstsein zu vermitteln, dass es mich betrifft und ich die Fähigkeiten dazu habe.<br><br><strong>Positiv formuliert</strong><br>Um dem Unterbewusstsein das richtige Bild zu suggerieren.<br><br><strong>Mit einer Bewertung</strong><br>Also einem Verkaufsargument, damit das Unterbewusstsein diese neue Richtung auch abnimmt, z.B.: ich darf, ich erlaube mir, ich habe das Recht, es steht mir zu, ich habe es verdient, ich entscheide mich...</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">NO GO / GO Beispiele</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text"><strong>1. Nicht das Endergebnis beschreiben</strong><br>NO GO: „Ich bin entspannt und gelassen."<br>GO: Ergründen, welche Einstellung in die Entspannung führt: „Ich erlaube mir, auch mal pragmatisch an Aufgaben heranzugehen."<br><br><strong>2. Richtige Bewertungen verwenden</strong><br>NO GO: „Ich möchte" (Möglichkeitsform), „Ich vertraue" (tue ich meist nicht), „Ich kann" (glaube ich nicht).<br>GO: Statt „ich möchte" &#8594; „ich entscheide mich...". Statt „ich vertraue" &#8594; „ich darf darauf vertrauen" (Einladung). Statt „ich kann" &#8594; „ich darf auf meine Fähigkeiten vertrauen".<br><br><strong>3. Nicht nur das Ziel mit Bewertung versehen</strong><br>NO GO: „Ich erlaube mir, täglich eine Stunde für mich zu nehmen, um mich zu regenerieren und Energie zu tanken."<br>GO: Eine individuelle Einstellung zum Ziel entwickeln: „Ich darf mich an erste Stelle stellen." &#8594; Konkreter auf das bisherige Manko zugeschnitten. Antwort auf: Welche Einstellung hat dieses Ziel bisher verhindert?<br><br><strong>4. Nicht in die Umsetzung gehen</strong><br>NO GO: Im förderlichen Gedanken das „WIE" beschreiben.<br>GO: Das „WIE" ist nicht Teil der förderlichen Einstellung. Der Gedanke zum Ziel ist der Inhalt.</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Coaching-Fragen</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">&#8226; Wie müsstest du denken, damit du das Ziel erreichst?<br><br>&#8226; Angenommen XY säße hier, was würde er/sie jetzt zu dir Aufbauendes sagen?<br><br>&#8226; Gab es bisher ähnliche Situationen, wo es besser ging? Welche Ressourcen hast du eingesetzt?<br><br>&#8226; Was hätte sich in früheren Situationen als hilfreicher Baustein für eine neue Einstellung erwiesen?<br><br>&#8226; Was ist der Grund dafür, dass es bisher nicht funktioniert hat?<br><br>&#8226; Was hättest du gebraucht?</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <button class="anno-add-btn" onclick="addAnnotation(5)">+ Anmerkung hinzufügen</button>
+  </div>
+
+  <!-- Anmerkungen Sektion 6: Hinderliche Gedanken -->
+  <div class="anno-section" id="anno-6">
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Hinderliche Gedanken erkennen</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">Hinderliche Gedanken sind oft tief verankerte Glaubenssätze aus der Kindheit. Sie äußern sich häufig als "Ich kann nicht...", "Ich bin nicht...", "Ich darf nicht...". Wichtig: Nicht bewerten, einfach festhalten.</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Umstrukturierung</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">Die Umformulierung erfolgt direkt neben dem hinderlichen Gedanken. Der Klient sieht so die Transformation. Die neue Formulierung muss für den Klienten glaubwürdig sein. Nicht einfach das Gegenteil formulieren, lieber einen realistischen Zwischenschritt finden.</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Kognitive Umstrukturierung</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">Hinderliche Gedanken hinterfragen: Strategien der kognitiven Umstrukturierung. Verschiedene Formen:
+
+Realitätstest
+- Ist es wirklich so?
+- Welche Beweise/Tatsachen sprechen für Ihre Sichtweise?
+- Welche anderen Möglichkeiten gibt es, die Situation zu erklären?
+- Sehen Sie nur die Negativseiten der Situation? Gibt es auch positive Seiten?
+- Verallgemeinern Sie zu stark?
+- Haben Sie zu hohe oder falsche Erwartungen?
+
+Hedonistisches Kalkül
+- Wie fühlen Sie sich, wenn Sie diesen Gedanken haben?
+- Hilft der Gedanke Ihnen, sich so zu fühlen, wie Sie möchten?
+- Hilft der Gedanke Ihnen, die Situation gut zu bewältigen?
+
+Distanzierung durch Rollentausch (zirkuläre Fragen)
+- Was würden Sie einem Freund sagen, der sich in einer ähnlichen Situation befindet?
+- Was würde ein guter Freund Ihnen in dieser Situation sagen?
+- Kennen Sie jemanden, der mit dieser Situation leichter fertig wird als Sie? Was sagt diese Person möglicherweise zu sich selbst?
+
+Temporale Relativierung
+- Wie werden Sie später, in einem Monat oder in einem Jahr darüber denken?
+- Stellen Sie sich vor, Sie seien 10 Jahre weiter. Wie werden Sie rückblickend die jetzige Situation betrachten?
+
+Entkatastrophisieren
+- Was würde schlimmstenfalls geschehen? Wie schlimm wäre das wirklich? Wie wahrscheinlich ist das?
+- Was wäre schlimmer als diese Situation?
+- Wie wichtig ist diese Sache wirklich für Sie?
+
+Fokussieren auf Ressourcen und Kompetenzen
+- Haben Sie schon einmal eine ähnlich schwierige Situation gemeistert? Wie haben Sie es damals geschafft? Was hat Ihnen geholfen?
+- Gibt es etwas anderes, das Ihnen sehr wichtig ist, an das Sie sich in dieser Situation erinnern könnten und das Ihnen Mut und Sicherheit geben kann?
+- Worauf können Sie vertrauen?
+
+Sinnorientierung
+- Was können Sie in dieser Situation lernen?
+- Welche Aufgabe haben Sie in dieser Situation?
+- Welchen Sinn finden Sie in dieser Situation?</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <button class="anno-add-btn" onclick="addAnnotation(6)">+ Anmerkung hinzufügen</button>
+  </div>
+
+  <!-- Anmerkungen Sektion 7: Mein inneres Team -->
+  <div class="anno-section" id="anno-7">
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Inneres Team (nach Schulz von Thun)</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">Das Modell des "Inneren Teams" macht die verschiedenen inneren Stimmen sichtbar. Jedes Teammitglied steht für einen Persönlichkeitsanteil, der in bestimmten Situationen aktiv wird. Es geht darum, alle Anteile wahrzunehmen und anzuerkennen.</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Anleitung</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">Wähle eine konkrete Erfolgssituation. Dann frage: "Wer in dir hat dazu beigetragen?" Gib den Anteilen Namen, z.B. "der Mutige", "die Organisierte", "der Kreative". Laute oder dominante Anteile dürfen größer dargestellt werden.</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <button class="anno-add-btn" onclick="addAnnotation(7)">+ Anmerkung hinzufügen</button>
+  </div>
+
+  <!-- Anmerkungen Sektion 8: Krafttier -->
+  <div class="anno-section" id="anno-8">
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Krafttier-Methode</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">Die Krafttier-Uebung arbeitet mit Projektionen. Das Tier, das der Klient wählt, repräsentiert oft unbewusste Wünsche und Ressourcen. Die Eigenschaften des Tieres sind Spiegel eigener Stärken und Entwicklungsfelder.</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Transfer-Fragen</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">Der entscheidende Moment ist der Transfer: Welche Tier-Eigenschaften besitzt der Klient bereits? Was möchte er sich aneignen? Und was braucht er dafür? Die Metapher des Tieres macht abstrakte Stärken greifbar und erinnerungsfähig.</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <button class="anno-add-btn" onclick="addAnnotation(8)">+ Anmerkung hinzufügen</button>
+  </div>
+
+  <!-- Anmerkungen Sektion 9: Byron Katie -->
+  <div class="anno-section" id="anno-9">
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">The Work (Byron Katie)</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">The Work besteht aus 4 Fragen und einer Umkehrung. Es geht darum, stressverursachende Gedanken zu hinterfragen. Wichtig: Die 5 Eingangs-Aussagen sollen ehrlich, ungefiltert und auch "kindisch" formuliert sein.</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Die 4 Überprüfungsfragen</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">1. Ist das wahr?
+2. Kannst du mit absoluter Sicherheit wissen, dass das wahr ist?
+3. Wie reagierst du, wenn du diesen Gedanken glaubst?
+4. Wer wärst du ohne diesen Gedanken?
+Die Umkehrung schliesst den Prozess ab: Den Gedanken auf sich selbst, auf den anderen und ins Gegenteil umkehren.</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <button class="anno-add-btn" onclick="addAnnotation(9)">+ Anmerkung hinzufügen</button>
+  </div>
+
+  <!-- Anmerkungen Sektion 10: Kreis der Gewohnheit -->
+  <div class="anno-section" id="anno-10">
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Kreis der Gewohnheit</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">Gewohnheiten sind Automatismen. Sie können Stabilität geben, aber auch Entwicklung blockieren. Diese Sektion regt den Klienten an, festgefahrene Muster zu erkennen und bewusst neue Erfahrungen zu machen.</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <div class="anno-note">
+      <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+        <span class="anno-toggle">-</span>
+        <span class="anno-title">Selbstverantwortung</span>
+      </div>
+      <div class="anno-body">
+        <div class="anno-text">Zwei Kernbotschaften prägen diese Sektion: Erstens, die volle Verantwortung für das eigene Leben anerkennen (Selbstverantwortung). Zweitens, Commitment: Ziele niederschreiben ist ein Vertrag mit sich selbst. Das Erlebnis einer neuen Erfahrung soll zum Abschluss beschrieben werden.</div>
+        <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+      </div>
+    </div>
+    <button class="anno-add-btn" onclick="addAnnotation(10)">+ Anmerkung hinzufügen</button>
+  </div>
+
+  </div><!-- /anno-content -->
+
+</aside>
+
+</div><!-- /container -->
+
+<div id="print-overview" class="print-only">
+  <div class="po-header">
+    <div class="po-title">Mentaler Prozess - Übersicht</div>
+    <div class="po-client" id="po-client-name"></div>
+  </div>
+
+  <div class="po-grid">
+    <!-- Zeile 1: Huna | Name + Commitment | Krafttier -->
+    <div class="po-cell po-huna" id="po-huna">
+      <div class="po-cell-title">Huna Grundannahmen</div>
+      <div class="po-cell-content" id="po-huna-content"></div>
+    </div>
+    <div class="po-cell po-center-top">
+      <div class="po-cell-title po-name" id="po-name-title">Name</div>
+      <div class="po-cell-content" id="po-klient-details"></div>
+      <div class="po-sub">
+        <div class="po-cell-title">Selbstverantwortung</div>
+        <div class="po-small">Du bist für DEIN Leben vollständig verantwortlich.</div>
+        <div class="po-cell-title" style="margin-top:4px;">Commitment</div>
+        <div class="po-small">Du bist dein Wort. Das Niederschreiben von Zielen ist wie ein Vertrag mit sich selbst.</div>
+      </div>
+    </div>
+    <div class="po-cell po-krafttier">
+      <div class="po-cell-title">Mein Krafttier</div>
+      <div class="po-cell-content" id="po-krafttier-content"></div>
+    </div>
+
+    <!-- Zeile 2: Stärken/Team | Mein Ziel | Hinderliche Gedanken -->
+    <div class="po-cell po-team">
+      <div class="po-cell-title">Stärken: Mein inneres Team</div>
+      <div class="po-cell-content" id="po-team-content"></div>
+    </div>
+    <div class="po-cell po-ziel">
+      <div class="po-cell-title po-big">Mein Ziel</div>
+      <div class="po-small">definieren und Visualisieren</div>
+      <div class="po-cell-content po-ziel-text" id="po-ziel-content"></div>
+      <div class="po-cell-content" id="po-smart-details" style="margin-top:3px;"></div>
+    </div>
+    <div class="po-cell po-hinderlich-args">
+      <div class="po-cell-title">Auseinandersetzung mit hinderlichen Gedanken</div>
+      <div class="po-small">Argumente sammeln</div>
+      <div class="po-cell-content" id="po-hinderlich-content"></div>
+    </div>
+
+    <!-- Zeile 3: VAKOG | Förderliche Gedanken | Hinderliche + Umstrukturierung -->
+    <div class="po-cell po-vakog">
+      <div class="po-cell-title">VAKOG - Was für ein Typ bin ich?</div>
+      <div class="po-cell-content" id="po-vakog-content"></div>
+    </div>
+    <div class="po-cell po-foerderlich">
+      <div class="po-cell-title po-big">Meine förderlichen Gedanken</div>
+      <div class="po-cell-content" id="po-foerderlich-content"></div>
+    </div>
+    <div class="po-cell po-hinderlich-umstr">
+      <div class="po-cell-title">Hinderliche Gedanken</div>
+      <div class="po-cell-content" id="po-umstrukturierung-content"></div>
+    </div>
+
+    <!-- Zeile 3 unten: Antreiber | Kreis der Gewohnheit | Erlebnis -->
+    <div class="po-cell po-antreiber">
+      <div class="po-cell-title">Antreiber</div>
+      <div class="po-cell-content" id="po-antreiber-content"></div>
+    </div>
+    <div class="po-cell po-gewohnheit">
+      <div class="po-cell-title">Mein Kreis der Gewohnheit</div>
+      <div class="po-cell-content" id="po-gewohnheit-content"></div>
+    </div>
+    <div class="po-cell po-erlebnis">
+      <div class="po-cell-title">Beschreibe dein Erlebnis</div>
+      <div class="po-small">nachdem du eine neue Erfahrung gemacht hast</div>
+      <div class="po-cell-content" id="po-erlebnis-content"></div>
+    </div>
+  </div>
+
+  <!-- Seite 2: Byron Katie + Coaching Details -->
+  <div style="page-break-before: always;"></div>
+  <div class="po-header" style="margin-top:2px;">
+    <div class="po-title">Mentaler Prozess - Details</div>
+    <div class="po-client" id="po-client-name-2"></div>
+  </div>
+
+  <div class="po-detail-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:2px; margin-top:2px;">
+    <!-- Coaching Anlass & Erwartungen -->
+    <div class="po-cell">
+      <div class="po-cell-title">Coaching-Anlass &amp; Erwartungen</div>
+      <div class="po-cell-content" id="po-coaching-content"></div>
+    </div>
+
+    <!-- SMART Details -->
+    <div class="po-cell">
+      <div class="po-cell-title">SMARTe Zieldefinition - Details</div>
+      <div class="po-cell-content" id="po-smart-full"></div>
+    </div>
+
+    <!-- Byron Katie - The Work -->
+    <div class="po-cell" style="grid-column: 1 / -1;">
+      <div class="po-cell-title">Byron Katie - The Work</div>
+      <div class="po-cell-content" id="po-byron-content"></div>
+    </div>
+  </div>
+
+  <div class="po-footer">menderpeter - Mental &amp; Businesscoaching</div>
+</div>
+
+
+
+<!-- Mobile Navigation Button -->
+<button class="mobile-nav-btn" id="mobile-nav-btn" onclick="openMobileNav()">Kapitel 1/11</button>
+
+<!-- Mobile Navigation Overlay -->
+<div class="mobile-nav-overlay" id="mobile-nav-overlay" onclick="closeMobileNav()">
+  <div class="mobile-nav-sheet" onclick="event.stopPropagation()">
+    <div class="mobile-nav-header">
+      <h3>Kapitel</h3>
+      <button class="mobile-nav-close" onclick="closeMobileNav()">x</button>
+    </div>
+    <div class="mobile-nav-item active" onclick="mobileGoTo(0)"><span class="mobile-nav-num">1</span>Klientendaten</div>
+    <div class="mobile-nav-item" onclick="mobileGoTo(1)"><span class="mobile-nav-num">2</span>Huna Grundannahmen</div>
+    <div class="mobile-nav-item" onclick="mobileGoTo(2)"><span class="mobile-nav-num">3</span>SMARTe Zieldefinition</div>
+    <div class="mobile-nav-item" onclick="mobileGoTo(3)"><span class="mobile-nav-num">4</span>VAKOG Wahrnehmung</div>
+    <div class="mobile-nav-item" onclick="mobileGoTo(4)"><span class="mobile-nav-num">5</span>Antreibertest</div>
+    <div class="mobile-nav-item" onclick="mobileGoTo(5)"><span class="mobile-nav-num">6</span>Foerderliche Gedanken</div>
+    <div class="mobile-nav-item" onclick="mobileGoTo(6)"><span class="mobile-nav-num">7</span>Hinderliche Gedanken</div>
+    <div class="mobile-nav-item" onclick="mobileGoTo(7)"><span class="mobile-nav-num">8</span>Mein inneres Team</div>
+    <div class="mobile-nav-item" onclick="mobileGoTo(8)"><span class="mobile-nav-num">9</span>Mein Krafttier</div>
+    <div class="mobile-nav-item" onclick="mobileGoTo(9)"><span class="mobile-nav-num">10</span>Byron Katie</div>
+    <div class="mobile-nav-item" onclick="mobileGoTo(10)"><span class="mobile-nav-num">11</span>Kreis der Gewohnheit</div>
+  </div>
+</div>
+
+<!-- Mobile Anmerkungen Button -->
+<button class="mobile-anno-btn" onclick="toggleMobileAnnotations()">Anmerkungen</button>
+
+<!-- Fragetechnik Button and Overlay -->
+<button class="ft-trigger" onclick="document.getElementById('ft-overlay').classList.add('open')">? Fragetechnik</button>
+
+<div class="ft-overlay" id="ft-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="ft-panel">
+    <div class="ft-panel-header">
+      <h2>Fragetechnik -- Werkzeugkasten</h2>
+      <button class="ft-close" onclick="document.getElementById('ft-overlay').classList.remove('open')">Schließen</button>
+    </div>
+    <div class="ft-grid">
+      <div class="ft-card">
+        <h3>W-Fragen</h3>
+        <ul>
+          <li>WIE ging es Ihnen dabei?</li>
+          <li>WIE geht es Ihnen jetzt?</li>
+          <li>WAS ging Ihnen durch den Kopf? WAS beschäftigt Sie gerade?</li>
+          <li>WIE ging es weiter?</li>
+          <li>WAS haben Sie dann gemacht, gedacht, gespürt? WIE haben die anderen reagiert?</li>
+          <li>WAS hat Ihnen daran gefallen, nicht gefallen? WAS hätten Sie gerne anders?</li>
+          <li>WAS bedeutet Ihnen...?</li>
+          <li>WAS fällt Ihnen ein, wenn...?</li>
+        </ul>
+      </div>
+
+      <div class="ft-card">
+        <h3>Neugierde ausdrücken</h3>
+        <ul>
+          <li>Das verstehe ich nicht ganz... Erzählen Sie mal...</li>
+          <li>Das interessiert mich!</li>
+          <li>Dazu möchte ich gerne mehr hören!</li>
+          <li>Oder auch durch kurze Impulse...</li>
+          <li>Wirklich? Spannend! Na so was! Aha!</li>
+        </ul>
+      </div>
+
+      <div class="ft-card">
+        <h3>Die Wunderfrage</h3>
+        <ul>
+          <li>Was würde geschehen, wenn die Schwierigkeiten, die gerade bei Ihnen aufgetreten sind, schlagartig verschwunden wären?</li>
+          <li>Was wäre dann anders?</li>
+          <li>Was würde sich nicht ändern?</li>
+          <li>Was würden Sie persönlich anders machen? Wer würde es als erster merken? Wer als letzter? Wer wäre am meisten überrascht? Wer wäre am meisten erleichtert?</li>
+          <li>Für wen hätte es vielleicht auch Vorteile?</li>
+        </ul>
+      </div>
+
+      <div class="ft-card">
+        <h3>Offene Fragen (Variante 1)</h3>
+        <ul>
+          <li>Was wären für Sie die wichtigsten Ziele unserer heutigen Sitzung?</li>
+          <li>Wie stellen Sie sich die konkrete Umsetzung Ihres Ziels vor?</li>
+          <li>Woran lag es Ihrer Meinung, dass es mit XY nicht so geklappt hat wie geplant?</li>
+          <li>Was hat Dich gehindert, es so zu tun, wie wir es verabredet hatten?</li>
+          <li>Achtung: W-Fragen können sehr leicht als Vorwurf verstanden werden, kein Warum als Beginn einer Frage verwenden.</li>
+        </ul>
+      </div>
+
+      <div class="ft-card">
+        <h3>Fokussierte Fragen (Variante 2)</h3>
+        <ul>
+          <li>Wann können wir mit der Zielarbeit beginnen?</li>
+          <li>Was ist konkret der erste Schritt?</li>
+        </ul>
+      </div>
+
+      <div class="ft-card">
+        <h3>Geschlossene Fragen</h3>
+        <ul>
+          <li>Variante 1 (Ja/Nein, paraphrasierend): "Hast Du die Unterlagen schon durchgesehen?", "Habe ich das richtig verstanden, dass...", "Sie meinen also, es ist wichtig......"</li>
+          <li>Variante 2 (Auswahl): "Wann willst Du das nachholen, heute oder morgen?", "Welchen Schritt sehen Sie jetzt als wichtigsten, Schritt A oder Schritt B?"</li>
+        </ul>
+      </div>
+
+      <div class="ft-card">
+        <h3>Problemorientierte Fragen</h3>
+        <ul>
+          <li>Seit wann besteht das Problem?</li>
+          <li>Wer ist am Problem und dessen Entstehung beteiligt?</li>
+          <li>Wie geht es Ihnen in der aktuellen Situation?</li>
+          <li>Auf einer Skala von 0 bis 10, wobei die 10 dafürsteht, dass Sie immer alles ansprechen, was Sie stört, und die 0 dafürsteht, dass Sie dies nie tun. Wo befinden Sie sich heute?</li>
+          <li>Was haben Sie schon unternommen?</li>
+        </ul>
+      </div>
+
+      <div class="ft-card">
+        <h3>Paraphisierende Fragen</h3>
+        <ul>
+          <li>Habe ich Sie richtig verstanden, Sie meinen.......?</li>
+          <li>Geh ich richtig in der Annahme, dass Sie..........?</li>
+          <li>Wenn ich das richtig sehe, dann haben Sie......?</li>
+          <li>Wenn das bei mir richtig angekommen ist, dann ist diese Situation für Sie....?</li>
+        </ul>
+      </div>
+
+      <div class="ft-card">
+        <h3>Verbalisierende Fragen</h3>
+        <ul>
+          <li>Wenn ich Ihnen so zuhöre, dann fühlt es sich für mich.......an - wie geht es Ihnen dabei?</li>
+          <li>Ich kann mir vorstellen, wenn ich in so einer Situation wäre, dann wäre das für mich belastend. Wie fühlt es sich für Sie an?</li>
+        </ul>
+      </div>
+
+      <div class="ft-card">
+        <h3>Lösungs- und Zielorientierte Fragen</h3>
+        <ul>
+          <li>Was genau wollen Sie erreichen?</li>
+          <li>Wie sollte eine Lösung aussehen?</li>
+          <li>Bis wann wollen Sie Ihr Ziel erreichen?</li>
+          <li>Woran erkennen Sie, dass Sie das Ziel erreicht haben?</li>
+          <li>Was wird sich durch das Erreichen des Ziels verändern?</li>
+        </ul>
+      </div>
+
+      <div class="ft-card">
+        <h3>Ressourcen Fragen</h3>
+        <ul>
+          <li>Was oder wer könnte Ihnen in dieser Angelegenheit behilflich sein?</li>
+          <li>Was könnten Sie tun, damit das Problem besser wird?</li>
+          <li>Wenn Sie sagen, dass Sie heute auf der Skala bei einer 3 stehen. Was würden Sie mehr machen, wenn Sie bei der 4 angelangt sind?</li>
+          <li>Was würde Ihnen ein guter Freund in dieser Situation raten?</li>
+          <li>Wie würde jemand, den Sie sehr schätzen, als nächstes tun?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========================
+// Navigation
+// ========================
+const sections = document.querySelectorAll('.section');
+const navItems = document.querySelectorAll('.nav-item');
+const annoSections = document.querySelectorAll('.anno-section');
+let currentSection = 0;
+
+function goToSection(idx) {
+  sections[currentSection].classList.remove('active');
+  navItems[currentSection].classList.remove('active');
+  if (annoSections[currentSection]) annoSections[currentSection].classList.remove('active');
+  currentSection = idx;
+  sections[currentSection].classList.add('active');
+  navItems[currentSection].classList.add('active');
+  if (annoSections[currentSection]) annoSections[currentSection].classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  updateMobileNavBtn();
+}
+
+// ========================
+// Annotations Toggle Collapse
+// ========================
+function toggleAnnoCollapse(bar) {
+  const note = bar.closest('.anno-note');
+  note.classList.toggle('collapsed');
+  const toggle = note.querySelector('.anno-toggle');
+  toggle.textContent = note.classList.contains('collapsed') ? '+' : '-';
+}
+
+function openMobileNav() {
+  document.getElementById('mobile-nav-overlay').classList.add('open');
+  // Update active state
+  const items = document.querySelectorAll('.mobile-nav-item');
+  items.forEach((item, i) => {
+    item.classList.toggle('active', i === currentSection);
+  });
+}
+
+function closeMobileNav() {
+  document.getElementById('mobile-nav-overlay').classList.remove('open');
+}
+
+function mobileGoTo(idx) {
+  goToSection(idx);
+  closeMobileNav();
+  updateMobileNavBtn();
+}
+
+function updateMobileNavBtn() {
+  const btn = document.getElementById('mobile-nav-btn');
+  if (btn) {
+    const names = ['Klientendaten','Huna','SMART','VAKOG','Antreibertest','Foerderlich','Hinderlich','Team','Krafttier','Byron Katie','Gewohnheit'];
+    btn.textContent = (currentSection + 1) + '/11 ' + names[currentSection];
+  }
+}
+
+function toggleMobileAnnotations() {
+  const panel = document.getElementById('annotations-panel');
+  panel.classList.toggle('mobile-open');
+  // Prevent body scroll when panel is open
+  if (panel.classList.contains('mobile-open')) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+}
+
+function toggleAnnoPanel() {
+  const content = document.getElementById('anno-content');
+  const toggle = document.getElementById('panel-toggle');
+  content.classList.toggle('panel-collapsed');
+  toggle.textContent = content.classList.contains('panel-collapsed') ? '+' : '-';
+}
+
+function toggleAnnoEdit(btn) {
+  const body = btn.closest('.anno-body');
+  const textDiv = body.querySelector('.anno-text');
+  if (textDiv.querySelector('textarea')) {
+    const ta = textDiv.querySelector('textarea');
+    textDiv.textContent = ta.value;
+    btn.textContent = 'Bearbeiten';
+  } else {
+    const current = textDiv.textContent;
+    textDiv.innerHTML = '<textarea>' + current + '</textarea>';
+    textDiv.querySelector('textarea').focus();
+    btn.textContent = 'Speichern';
+  }
+}
+
+function addAnnotation(sectionIdx) {
+  const annoContainer = document.getElementById('anno-' + sectionIdx);
+  const addBtn = annoContainer.querySelector('.anno-add-btn');
+  const note = document.createElement('div');
+  note.className = 'anno-note';
+  note.innerHTML = `
+    <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+      <span class="anno-toggle">-</span>
+      <span class="anno-title" contenteditable="true">Neue Anmerkung</span>
+    </div>
+    <div class="anno-body">
+      <div class="anno-text"><textarea placeholder="Anmerkung hier eingeben ..."></textarea></div>
+      <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Speichern</button>
+    </div>
+  `;
+  annoContainer.insertBefore(note, addBtn);
+  note.querySelector('textarea').focus();
+}
+
+// ========================
+// VAKOG
+// ========================
+const vakogBegriffe = [
+  'Kerze', 'Sonnenuntergang', 'Pferd', 'Strand', 'Lederhose', 'Buch',
+  'Schule', 'Zimtplätzchen', 'Theater', 'Neujahr', 'Cellophanpapier',
+  'Telefon', 'Autobahn', 'Beethoven', 'Tauben', 'Rose', 'Holzhacken', 'Sonntag'
+];
+
+const sinne = ['v','a','k','g','o'];
+
+function buildVAKOG() {
+  const tbody = document.getElementById('vakog-body');
+  vakogBegriffe.forEach((b, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${i+1}</td><td>${b}</td>` +
+      sinne.map(s => `<td><input type="checkbox" id="vakog_${i}_${s}" onchange="updateVAKOG()"></td>`).join('');
+    tbody.appendChild(tr);
+  });
+}
+
+function updateVAKOG() {
+  const sums = { v:0, a:0, k:0, g:0, o:0 };
+  vakogBegriffe.forEach((_, i) => {
+    sinne.forEach(s => {
+      if (document.getElementById(`vakog_${i}_${s}`).checked) sums[s]++;
+    });
+  });
+  document.getElementById('vakog-sum-v').textContent = sums.v;
+  document.getElementById('vakog-sum-a').textContent = sums.a;
+  document.getElementById('vakog-sum-k').textContent = sums.k;
+  document.getElementById('vakog-sum-g').textContent = sums.g;
+  document.getElementById('vakog-sum-o').textContent = sums.o;
+
+  const labels = { v:'Visuell', a:'Auditiv', k:'Kinästhetisch', g:'Gustatorisch', o:'Olfaktorisch' };
+  const max = Math.max(...Object.values(sums));
+  if (max > 0) {
+    const dominant = Object.entries(sums).filter(([_,v]) => v === max).map(([k]) => labels[k]);
+    document.getElementById('vakog-result').style.display = 'block';
+    document.getElementById('vakog-result-text').textContent = dominant.join(' und ') + ` (${max} von ${vakogBegriffe.length})`;
+  }
+}
+
+buildVAKOG();
+
+// ========================
+// Antreibertest
+// ========================
+const antreiberFragen = [
+  { nr: 1,  text: 'Am liebsten mache ich alles selbst.', kat: 'stark' },
+  { nr: 2,  text: 'Ich halte gerne an Bewährtem fest, Veränderungen bedeuten Stress für mich.', kat: 'kannnicht' },
+  { nr: 3,  text: 'Wenn ich eine Aufgabe begonnen habe, führe ich sie auch immer zu Ende.', kat: 'streng' },
+  { nr: 4,  text: 'Es ist entsetzlich, wenn etwas nicht so läuft, wie ich will oder geplant habe.', kat: 'hut' },
+  { nr: 5,  text: 'Aufgaben erledige ich möglichst rasch, denn es gibt noch viel zu tun.', kat: 'beeil' },
+  { nr: 6,  text: 'Nur was hart erarbeitet ist, zählt.', kat: 'streng' },
+  { nr: 7,  text: 'Es ist nicht akzeptabel, wenn ich eine Arbeit nicht schaffe oder einen Termin nicht einhalte.', kat: 'perfekt' },
+  { nr: 8,  text: 'Ich kann diesen Druck (Angst, Schmerzen etc.) einfach nicht aushalten.', kat: 'kannnicht' },
+  { nr: 9,  text: 'Ich bin ständig auf Trab. Alles muss schnell gehen.', kat: 'beeil' },
+  { nr: 10, text: 'Ich muss immer für meinen Betrieb da sein.', kat: 'perfekt' },
+  { nr: 11, text: 'Es ist wichtig, dass ich alles unter Kontrolle habe.', kat: 'hut' },
+  { nr: 12, text: 'Ich will die anderen nicht enttäuschen.', kat: 'beliebt' },
+  { nr: 13, text: 'Es gibt nichts Schlimmeres als Fehler zu machen.', kat: 'perfekt' },
+  { nr: 14, text: 'Beim Telefonieren bearbeite oder erledige ich häufig noch nebenbei andere Dinge.', kat: 'beeil' },
+  { nr: 15, text: 'Auf mich muss 100%iger Verlass sein.', kat: 'perfekt' },
+  { nr: 16, text: 'Erfolge muss man sich erst verdienen.', kat: 'streng' },
+  { nr: 17, text: 'Ich bin dafür verantwortlich, dass diejenigen, die mit mir zu tun haben, sich wohl fühlen.', kat: 'beliebt' },
+  { nr: 18, text: 'Das schaffe ich nie.', kat: 'kannnicht' },
+  { nr: 19, text: 'Im Umgang mit anderen bin ich auf Distanz bedacht. Zuviel Nähe schmälert die Autorität.', kat: 'stark' },
+  { nr: 20, text: 'Menschen, die nicht zur Sache kommen, unterbreche ich öfter, denn meine Zeit ist kostbar.', kat: 'beeil' },
+  { nr: 21, text: 'Ich bin diplomatisch, damit ich möglichst niemanden vergraule.', kat: 'beliebt' },
+  { nr: 22, text: 'Ich strenge mich an, meine Ziele zu erreichen.', kat: 'streng' },
+  { nr: 23, text: 'Es ist schlimm, wenn andere mich kritisieren.', kat: 'beliebt' },
+  { nr: 24, text: 'Ich habe bei neuen Herausforderungen das Gefühl, dass ich versagen werde.', kat: 'kannnicht' },
+  { nr: 25, text: 'Wenn ich mich auf andere verlasse, bin ich verlassen.', kat: 'stark' },
+  { nr: 26, text: 'Probleme und Schwierigkeiten sind einfach nur fürchterlich.', kat: 'kannnicht' },
+  { nr: 27, text: 'Es ist wichtig für mich, von anderen akzeptiert zu werden.', kat: 'beliebt' },
+  { nr: 28, text: 'Bei Entscheidungen muss ich mir 100% sicher sein.', kat: 'hut' },
+  { nr: 29, text: 'Leute, die herumtrödeln, regen mich auf, denn Zeit ist Geld.', kat: 'beeil' },
+  { nr: 30, text: 'Ich muss ständig daran denken, was alles passieren könnte.', kat: 'hut' },
+  { nr: 31, text: 'Ich löse meine Probleme selbst. Selbst ist der Mann/die Frau.', kat: 'stark' },
+  { nr: 32, text: 'Meine Devise lautet: Wer rastet, der rostet.', kat: 'streng' },
+  { nr: 33, text: 'Ich muss immer alles richtig machen.', kat: 'perfekt' },
+  { nr: 34, text: 'Es ist schrecklich, auf andere angewiesen zu sein.', kat: 'stark' },
+  { nr: 35, text: 'Es ist ganz fürchterlich, wenn ich nicht weiß, was auf mich zukommt.', kat: 'hut' },
+];
+
+function buildAntreiber() {
+  const container = document.getElementById('antreiber-questions');
+  antreiberFragen.forEach((f, i) => {
+    const div = document.createElement('div');
+    div.className = 'radio-row';
+    div.innerHTML = `
+      <span class="question-num">${f.nr}.</span>
+      <span class="question-text">${f.text}</span>
+      <div class="radio-options">
+        <label class="radio-option"><input type="radio" name="antreiber_${i}" value="2"> 2</label>
+        <label class="radio-option"><input type="radio" name="antreiber_${i}" value="1"> 1</label>
+        <label class="radio-option"><input type="radio" name="antreiber_${i}" value="0"> 0</label>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+const antreiberInterpretation = {
+  perfekt: {
+    name: 'Sei perfekt',
+    staerken: 'Genauigkeit, Blick fürs Detail, strebt nach hoher Qualität.',
+    schwaechen: 'Arbeiten werden nicht abgeschlossen, Fehler sind gefürchtet. Die Richtschnur dafür, wann etwas „gut genug" ist, fehlt.',
+    empfehlungen: 'Machen Sie sich bewusst, dass Menschen (auch Sie selbst) nicht perfekt sein können. Setzen Sie sich realistische Standards für Leistung und Genauigkeit. Begreifen Sie Fehler als Lernchance.',
+    foerderlich: 'Gut ist gut genug. Es ist in Ordnung Fehler zu machen. Ein gutes Pferd springt nur so hoch, wie es springen muss.'
+  },
+  beliebt: {
+    name: 'Sei beliebt',
+    staerken: 'Gutes Einfühlungsvermögen, Höflichkeit, Harmonie.',
+    schwaechen: 'Scheut Konflikte und schlechte Stimmung genauso wie nicht dazuzugehören oder abgelehnt zu werden.',
+    empfehlungen: 'Fangen Sie an, anderen Fragen zu stellen, statt zu raten, was diese wollen. Üben Sie es, NEIN zu sagen und auszusprechen, was Ihnen nicht gefällt. Setzen Sie freundlich und bestimmt Grenzen.',
+    foerderlich: 'Die Erwartungen anderer sind die Erwartungen anderer. Ich darf NEIN sagen.'
+  },
+  stark: {
+    name: 'Sei stark',
+    staerken: 'Hohes Durchsetzungsvermögen, Belastbarkeit.',
+    schwaechen: 'Nimmt auch bei hoher Arbeitsbelastung keine Hilfe an, kann schwer bis gar nicht im Team arbeiten.',
+    empfehlungen: 'Schaffen Sie sich Puffer, sodass Sie Ihre Arbeitsbelastung überwachen können. Bitten Sie andere Menschen um Hilfe. Beobachten Sie, wie sich Ihre Beziehungen verbessern, wenn Sie sich von anderen helfen lassen.',
+    foerderlich: 'Ein Team ist mehr als die Summe seiner Teile. Ich bin offen und drücke meine Wünsche aus.'
+  },
+  beeil: {
+    name: 'Sei schnell',
+    staerken: 'Hohe Auffassungsgabe, Flexibilität, ergreift Chancen.',
+    schwaechen: 'Läuft Gefahr sich zu verzetteln, oberflächlich, kann zeitlich wie inhaltlich keine Schwerpunkte setzen, wenig Zeit für sich selbst.',
+    empfehlungen: 'Planen Sie Ihre Arbeit mit Zwischenzielen. Konzentrieren Sie sich darauf, anderen sorgfältig zuzuhören, bis sie aufhören zu sprechen. Praktizieren Sie regelmäßige STOPs. Holen Sie sich Rückmeldung für Genauigkeit.',
+    foerderlich: 'Ich darf mir die Zeit nehmen, die ich brauche. Rom wurde auch nicht an einem Tag erbaut.'
+  },
+  streng: {
+    name: 'Streng dich an',
+    staerken: 'Begeisterungsfähigkeit, hohes Engagement, Enthusiasmus.',
+    schwaechen: 'Möchte überall zu den Besten gehören und investiert Unmengen von Energie in sämtliche Bereiche. Es zählt, was mit Mühe und Anstrengung erreicht wurde.',
+    empfehlungen: 'Machen Sie sich einen Plan inklusive Beendigung der Aufgabe und halten Sie sich daran. Prüfen Sie die Anforderungen einer Aufgabe, sodass Sie sicher sein können, nur das Vereinbarte zu tun. Machen Sie sich eine Checkliste, um nichts Wesentliches zu übersehen.',
+    foerderlich: 'Es darf auch manchmal leicht gehen. Ich mache es gut und habe Erfolg.'
+  },
+  hut: {
+    name: 'Sei auf der Hut',
+    staerken: 'Umsichtigkeit, Vorsicht, gute Risikoabschätzung.',
+    schwaechen: 'Übermäßige Sorgen, Entscheidungsschwierigkeiten, Kontrollbedürfnis. Schwierigkeiten, Veränderungen zuzulassen.',
+    empfehlungen: 'Üben Sie, Entscheidungen auch mit unvollständigen Informationen zu treffen. Akzeptieren Sie, dass nicht alles kontrollierbar ist. Vertrauen Sie darauf, dass Sie auch mit unerwarteten Situationen umgehen können.',
+    foerderlich: 'Ich vertraue mir und meinen Fähigkeiten. Es ist sicher, loszulassen.'
+  },
+  kannnicht: {
+    name: 'Ich kann nicht',
+    staerken: 'Bescheidenheit, Realismus, Vorsicht bei Überforderung.',
+    schwaechen: 'Geringes Selbstvertrauen, Vermeidungsverhalten, Gefühl der Hilflosigkeit. Neigt dazu, vor Herausforderungen aufzugeben.',
+    empfehlungen: 'Erinnern Sie sich an Situationen, die Sie erfolgreich gemeistert haben. Setzen Sie sich kleine, erreichbare Ziele. Feiern Sie Ihre Erfolge bewusst. Ersetzen Sie "Ich kann nicht" durch "Ich lerne noch".',
+    foerderlich: 'Ich bin fähiger als ich denke. Ich kann Herausforderungen meistern.'
+  }
+};
+
+function calcAntreiber() {
+  const scores = { perfekt:0, beliebt:0, stark:0, beeil:0, streng:0, hut:0, kannnicht:0 };
+  antreiberFragen.forEach((f, i) => {
+    const sel = document.querySelector(`input[name="antreiber_${i}"]:checked`);
+    if (sel) scores[f.kat] += parseInt(sel.value);
+  });
+
+  Object.keys(scores).forEach(k => {
+    document.getElementById(`score-${k}`).textContent = scores[k];
+  });
+
+  const maxScore = Math.max(...Object.values(scores));
+  let maxKey = null;
+  Object.keys(scores).forEach(k => {
+    const card = document.getElementById(`res-${k}`);
+    const isMax = scores[k] === maxScore && maxScore > 0;
+    card.classList.toggle('highlight', isMax);
+    if (isMax && !maxKey) maxKey = k;
+  });
+
+  // Stärksten Antreiber hervorheben und aufklappen
+  if (maxKey) {
+    document.querySelectorAll('.antreiber-interpretation').forEach(el => {
+      const grid = el.querySelector('.interp-grid');
+      const toggle = el.querySelector('.interp-header span');
+      const isMatch = el.dataset.antreiber === maxKey;
+      el.querySelector('.interp-header').style.background = isMatch
+        ? 'linear-gradient(135deg, var(--primary), var(--primary-light))'
+        : 'linear-gradient(135deg, #666, #888)';
+      if (isMatch) {
+        grid.style.display = 'grid';
+        toggle.textContent = '-';
+      } else {
+        grid.style.display = 'none';
+        toggle.textContent = '+';
+      }
+    });
+  }
+}
+
+function toggleInterpretation(el) {
+  const grid = el.querySelector('.interp-grid');
+  const toggle = el.querySelector('.interp-header span');
+  if (grid.style.display === 'none') {
+    grid.style.display = 'grid';
+    toggle.textContent = '-';
+  } else {
+    grid.style.display = 'none';
+    toggle.textContent = '+';
+  }
+}
+
+buildAntreiber();
+
+// ========================
+// Dynamic Lists
+// ========================
+function removeListItem(btn) {
+  const item = btn.closest('.list-item') || btn.closest('.thought-pair');
+  if (item) item.remove();
+  renumberList(item?.closest('.dynamic-list'));
+}
+
+function renumberList(list) {
+  if (!list) return;
+  list.querySelectorAll('.list-item span:first-child').forEach((s, i) => {
+    s.textContent = (i + 1) + '.';
+  });
+}
+
+function addFoerderlich() {
+  const list = document.getElementById('förderliche-list');
+  const n = list.children.length + 1;
+  const div = document.createElement('div');
+  div.className = 'list-item';
+  div.innerHTML = `
+    <span style="min-width:24px; font-weight:700; color:var(--accent); padding-top:10px;">${n}.</span>
+    <textarea class="förderlich-input" rows="2" placeholder="Förderlicher Gedanke ..."></textarea>
+    <button class="btn-remove" onclick="removeListItem(this)">X</button>
+  `;
+  list.appendChild(div);
+}
+
+function addHinderlich() {
+  const list = document.getElementById('hinderliche-list');
+  const div = document.createElement('div');
+  div.className = 'thought-pair';
+  div.innerHTML = `
+    <textarea class="hinderlich-input" rows="2" placeholder="Hinderlicher Gedanke ..."></textarea>
+    <div class="arrow">&rarr;</div>
+    <textarea class="umformulierung-input" rows="2" placeholder="Umformulierung ..."></textarea>
+  `;
+  list.appendChild(div);
+}
+
+// Team Members
+function addTeamMember() {
+  const list = document.getElementById('team-list');
+  const n = list.children.length + 1;
+  const div = document.createElement('div');
+  div.className = 'list-item';
+  div.style.cssText = 'flex-direction:column; gap:8px;';
+  div.innerHTML = `
+    <div style="display:flex; gap:10px; width:100%; align-items:center;">
+      <span style="min-width:100px; font-weight:700; color:var(--accent);">Mitglied ${n}</span>
+      <input type="text" class="team-name" placeholder="Name / Bezeichnung des Teammitglieds" style="flex:1;">
+      <button class="btn-remove" onclick="this.closest('.list-item').remove()">X</button>
+    </div>
+    <textarea class="team-desc" rows="2" placeholder="Beschreibung, Rolle, Stärke dieses Teammitglieds ..." style="width:100%;"></textarea>
+  `;
+  list.appendChild(div);
+}
+
+// Initial Team Members
+for (let i = 0; i < 5; i++) addTeamMember();
+
+function addGewohnheit() {
+  const list = document.getElementById('gewohnheit-list');
+  const n = list.children.length + 1;
+  const div = document.createElement('div');
+  div.className = 'list-item';
+  div.innerHTML = `
+    <span style="min-width:24px; font-weight:700; color:var(--warning); padding-top:10px;">${n}.</span>
+    <textarea class="gewohnheit-input" rows="2" placeholder="Eine Gewohnheit, die dich zurückhält ..."></textarea>
+    <button class="btn-remove" onclick="removeListItem(this)">X</button>
+  `;
+  list.appendChild(div);
+}
+
+// ========================
+// JSON Export / Import
+// ========================
+function gatherData() {
+  const data = {};
+
+  // All text inputs and textareas with IDs
+  document.querySelectorAll('input[type="text"][id], input[type="date"][id], input[type="email"][id], input[type="tel"][id], textarea[id]').forEach(el => {
+    data[el.id] = el.value;
+  });
+
+  // VAKOG checkboxes
+  data.vakog = {};
+  vakogBegriffe.forEach((_, i) => {
+    sinne.forEach(s => {
+      data.vakog[`${i}_${s}`] = document.getElementById(`vakog_${i}_${s}`).checked;
+    });
+  });
+
+  // Antreiber radios
+  data.antreiber = {};
+  antreiberFragen.forEach((_, i) => {
+    const sel = document.querySelector(`input[name="antreiber_${i}"]:checked`);
+    data.antreiber[i] = sel ? parseInt(sel.value) : null;
+  });
+
+  // Dynamic lists
+  data.förderliche = [...document.querySelectorAll('.förderlich-input')].map(t => t.value);
+  data.hinderliche = [...document.querySelectorAll('.hinderlich-input')].map((t, i) => ({
+    hinderlich: t.value,
+    umformulierung: document.querySelectorAll('.umformulierung-input')[i]?.value || ''
+  }));
+  data.team = [...document.querySelectorAll('#team-list .list-item')].map(item => ({
+    name: item.querySelector('.team-name')?.value || '',
+    desc: item.querySelector('.team-desc')?.value || ''
+  }));
+  data.gewohnheiten = [...document.querySelectorAll('.gewohnheit-input')].map(t => t.value);
+
+  // Annotations
+  data.annotations = {};
+  for (let i = 0; i <= 10; i++) {
+    const container = document.getElementById('anno-' + i);
+    if (!container) continue;
+    data.annotations[i] = [...container.querySelectorAll('.anno-note')].map(note => {
+      const titleEl = note.querySelector('.anno-title');
+      const textEl = note.querySelector('.anno-text');
+      const ta = textEl.querySelector('textarea');
+      return {
+        title: titleEl.textContent,
+        text: ta ? ta.value : textEl.textContent
+      };
+    });
+  }
+
+  return data;
+}
+
+function exportJSON() {
+  const data = gatherData();
+  const name = (data.klient_nachname || 'Klient') + '_' + (data.klient_vorname || '');
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `MP_${name}_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+function importJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      restoreData(data);
+    } catch(err) {
+      alert('Fehler beim Laden der Datei: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function restoreData(data) {
+  // Text fields
+  Object.keys(data).forEach(key => {
+    if (typeof data[key] === 'string') {
+      const el = document.getElementById(key);
+      if (el) el.value = data[key];
+    }
+  });
+
+  // VAKOG
+  if (data.vakog) {
+    Object.keys(data.vakog).forEach(key => {
+      const el = document.getElementById(`vakog_${key}`);
+      if (el) el.checked = data.vakog[key];
+    });
+    updateVAKOG();
+  }
+
+  // Antreiber
+  if (data.antreiber) {
+    Object.keys(data.antreiber).forEach(i => {
+      if (data.antreiber[i] !== null) {
+        const radio = document.querySelector(`input[name="antreiber_${i}"][value="${data.antreiber[i]}"]`);
+        if (radio) radio.checked = true;
+      }
+    });
+    calcAntreiber();
+  }
+
+  // Dynamic: Förderliche
+  if (data.förderliche) {
+    const list = document.getElementById('förderliche-list');
+    list.innerHTML = '';
+    data.förderliche.forEach((text, i) => {
+      const div = document.createElement('div');
+      div.className = 'list-item';
+      div.innerHTML = `
+        <span style="min-width:24px; font-weight:700; color:var(--accent); padding-top:10px;">${i+1}.</span>
+        <textarea class="förderlich-input" rows="2">${text}</textarea>
+        <button class="btn-remove" onclick="removeListItem(this)">X</button>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  // Dynamic: Hinderliche
+  if (data.hinderliche) {
+    const list = document.getElementById('hinderliche-list');
+    list.innerHTML = '';
+    data.hinderliche.forEach(pair => {
+      const div = document.createElement('div');
+      div.className = 'thought-pair';
+      div.innerHTML = `
+        <textarea class="hinderlich-input" rows="2">${pair.hinderlich}</textarea>
+        <div class="arrow">&rarr;</div>
+        <textarea class="umformulierung-input" rows="2">${pair.umformulierung}</textarea>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  // Dynamic: Team
+  if (data.team) {
+    const list = document.getElementById('team-list');
+    list.innerHTML = '';
+    data.team.forEach((m, i) => {
+      const div = document.createElement('div');
+      div.className = 'list-item';
+      div.style.cssText = 'flex-direction:column; gap:8px;';
+      div.innerHTML = `
+        <div style="display:flex; gap:10px; width:100%; align-items:center;">
+          <span style="min-width:100px; font-weight:700; color:var(--accent);">Mitglied ${i+1}</span>
+          <input type="text" class="team-name" value="${m.name}" style="flex:1;">
+          <button class="btn-remove" onclick="this.closest('.list-item').remove()">X</button>
+        </div>
+        <textarea class="team-desc" rows="2" style="width:100%;">${m.desc}</textarea>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  // Dynamic: Gewohnheiten
+  if (data.gewohnheiten) {
+    const list = document.getElementById('gewohnheit-list');
+    list.innerHTML = '';
+    data.gewohnheiten.forEach((text, i) => {
+      const div = document.createElement('div');
+      div.className = 'list-item';
+      div.innerHTML = `
+        <span style="min-width:24px; font-weight:700; color:var(--warning); padding-top:10px;">${i+1}.</span>
+        <textarea class="gewohnheit-input" rows="2">${text}</textarea>
+        <button class="btn-remove" onclick="removeListItem(this)">X</button>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  // Annotations
+  if (data.annotations) {
+    Object.keys(data.annotations).forEach(idx => {
+      const container = document.getElementById('anno-' + idx);
+      if (!container) return;
+      const addBtn = container.querySelector('.anno-add-btn');
+      container.querySelectorAll('.anno-note').forEach(n => n.remove());
+      data.annotations[idx].forEach(anno => {
+        const note = document.createElement('div');
+        note.className = 'anno-note';
+        note.innerHTML = `
+          <div class="anno-title-bar" onclick="toggleAnnoCollapse(this)">
+            <span class="anno-toggle">-</span>
+            <span class="anno-title">${anno.title}</span>
+          </div>
+          <div class="anno-body">
+            <div class="anno-text">${anno.text}</div>
+            <button class="anno-edit-btn" onclick="toggleAnnoEdit(this)">Bearbeiten</button>
+          </div>
+        `;
+        container.insertBefore(note, addBtn);
+      });
+    });
+  }
+}
+
+// ========================
+// Print Overview
+// ========================
+function printOverview() {
+  const v = id => { const el = document.getElementById(id); return el ? (el.value || el.textContent || '') : ''; };
+
+  // Name
+  const vorname = v('klient_vorname');
+  const nachname = v('klient_nachname');
+  const name = (vorname + ' ' + nachname).trim() || 'Klient';
+  document.getElementById('po-client-name').textContent = name;
+  document.getElementById('po-name-title').textContent = name;
+  const cn2 = document.getElementById('po-client-name-2');
+  if (cn2) cn2.textContent = name;
+
+  // Klientendaten
+  let klientHtml = '';
+  const email = v('klient_email');
+  const telefon = v('klient_telefon');
+  const geburt = v('klient_geburtsdatum');
+  const beruf = v('klient_beruf');
+  const coach = v('coaching_coach');
+  const erstgespraech = v('coaching_erstgespraech');
+  if (email) klientHtml += '<div class="po-val"><span class="po-val-label">Email:</span> ' + email + '</div>';
+  if (telefon) klientHtml += '<div class="po-val"><span class="po-val-label">Telefon:</span> ' + telefon + '</div>';
+  if (geburt) klientHtml += '<div class="po-val"><span class="po-val-label">Geburtsdatum:</span> ' + geburt + '</div>';
+  if (beruf) klientHtml += '<div class="po-val"><span class="po-val-label">Beruf:</span> ' + beruf + '</div>';
+  if (coach) klientHtml += '<div class="po-val"><span class="po-val-label">Coach:</span> ' + coach + '</div>';
+  if (erstgespraech) klientHtml += '<div class="po-val"><span class="po-val-label">Erstgespräch:</span> ' + erstgespraech + '</div>';
+  const klientEl = document.getElementById('po-klient-details');
+  if (klientEl) klientEl.innerHTML = klientHtml;
+
+  // Huna
+  let hunaHtml = '';
+  const hunaIds = ['huna_ike','huna_kala','huna_makia','huna_manawa','huna_aloha','huna_mana','huna_pono'];
+  const hunaNames = ['IKE','KALA','MAKIA','MANAWA','ALOHA','MANA','PONO'];
+  const hunaMeaning = [
+    'Die Welt ist das, wofür du sie hältst',
+    'Es gibt keine Grenzen',
+    'Energie folgt der Aufmerksamkeit',
+    'Alle Kraft liegt im Augenblick',
+    'L(i)eben heißt, mit dir glücklich zu sein',
+    'Alle Kraft kommt von Innen',
+    'Effektivität ist das Maß aller Dinge'
+  ];
+  hunaIds.forEach((id, i) => {
+    const val = v(id);
+    hunaHtml += '<div class="po-val"><span class="po-val-label"><strong>' + hunaNames[i] + '</strong> ' + hunaMeaning[i] + '</span><span class="po-val-score">' + (val || '0') + '</span></div>';
+  });
+  document.getElementById('po-huna-content').innerHTML = hunaHtml;
+
+  // Krafttier
+  let kraftHtml = '';
+  const tier = v('krafttier_name');
+  kraftHtml += '<div><strong>' + (tier || '-') + '</strong></div>';
+  const eigenschaften = v('krafttier_eigenschaften');
+  if (eigenschaften) {
+    kraftHtml += '<div class="po-cell-title" style="margin-top:3px;">Eigenschaften:</div>';
+    kraftHtml += '<div class="po-gedanke">' + eigenschaften + '</div>';
+  }
+  const bereits = v('krafttier_bereits');
+  if (bereits) {
+    kraftHtml += '<div class="po-cell-title" style="margin-top:3px;">Bereits vorhanden:</div>';
+    kraftHtml += '<div class="po-gedanke">' + bereits + '</div>';
+  }
+  const aneignen = v('krafttier_aneignen');
+  if (aneignen) {
+    kraftHtml += '<div class="po-cell-title" style="margin-top:3px;">Aneignen:</div>';
+    kraftHtml += '<div class="po-gedanke">' + aneignen + '</div>';
+  }
+  const brauche = v('krafttier_brauche');
+  if (brauche) {
+    kraftHtml += '<div class="po-cell-title" style="margin-top:3px;">Brauche dafür:</div>';
+    kraftHtml += '<div class="po-gedanke">' + brauche + '</div>';
+  }
+  document.getElementById('po-krafttier-content').innerHTML = kraftHtml;
+
+  // Team
+  let teamHtml = '';
+  document.querySelectorAll('#team-list .list-item').forEach(item => {
+    const nameEl = item.querySelector('.team-name');
+    const descEl = item.querySelector('.team-desc');
+    const memberName = nameEl ? nameEl.value : '';
+    const memberDesc = descEl ? descEl.value : '';
+    if (memberName) teamHtml += '<div class="po-gedanke"><strong>' + memberName + '</strong>' + (memberDesc ? ': ' + memberDesc : '') + '</div>';
+  });
+  document.getElementById('po-team-content').innerHTML = teamHtml || '-';
+
+  // Ziel
+  const ziel = v('smart_zusammenfassung') || '-';
+  document.getElementById('po-ziel-content').textContent = ziel;
+
+  // SMART-Details (Kurzform auf Seite 1)
+  let smartShort = '';
+  const smartS = v('smart_spezifisch');
+  const smartM = v('smart_messbar');
+  const smartA = v('smart_attraktiv');
+  const smartR = v('smart_realistisch');
+  const smartT = v('smart_zeitgebunden');
+  if (smartS) smartShort += '<div class="po-val"><strong>S:</strong> ' + smartS.substring(0,80) + (smartS.length>80?'...':'') + '</div>';
+  if (smartM) smartShort += '<div class="po-val"><strong>M:</strong> ' + smartM.substring(0,80) + (smartM.length>80?'...':'') + '</div>';
+  if (smartA) smartShort += '<div class="po-val"><strong>A:</strong> ' + smartA.substring(0,80) + (smartA.length>80?'...':'') + '</div>';
+  if (smartR) smartShort += '<div class="po-val"><strong>R:</strong> ' + smartR.substring(0,80) + (smartR.length>80?'...':'') + '</div>';
+  if (smartT) smartShort += '<div class="po-val"><strong>T:</strong> ' + smartT + '</div>';
+  const smartEl = document.getElementById('po-smart-details');
+  if (smartEl) smartEl.innerHTML = smartShort;
+
+  // SMART-Details (Volltext auf Seite 2)
+  let smartFull = '';
+  if (smartS) smartFull += '<div style="margin-bottom:3px;"><strong>Spezifisch:</strong> ' + smartS + '</div>';
+  if (smartM) smartFull += '<div style="margin-bottom:3px;"><strong>Messbar:</strong> ' + smartM + '</div>';
+  if (smartA) smartFull += '<div style="margin-bottom:3px;"><strong>Attraktiv:</strong> ' + smartA + '</div>';
+  if (smartR) smartFull += '<div style="margin-bottom:3px;"><strong>Realistisch:</strong> ' + smartR + '</div>';
+  if (smartT) smartFull += '<div style="margin-bottom:3px;"><strong>Zeitgebunden:</strong> ' + smartT + '</div>';
+  const smartFullEl = document.getElementById('po-smart-full');
+  if (smartFullEl) smartFullEl.innerHTML = smartFull || '-';
+
+  // VAKOG
+  let vakogHtml = '';
+  const vakogLabels = {v:'Visuell (ich sehe)', a:'Auditiv (ich höre)', k:'Kinästhetisch (ich fühle)', o:'Olfaktorisch (ich rieche)', g:'Gustatorisch (ich schmecke)'};
+  ['v','a','k','o','g'].forEach(k => {
+    const scoreEl = document.getElementById('vakog-sum-' + k);
+    const score = scoreEl ? scoreEl.textContent : '0';
+    vakogHtml += '<div class="po-val"><span class="po-val-label">' + vakogLabels[k] + '</span><span class="po-val-score">' + score + '</span></div>';
+  });
+  document.getElementById('po-vakog-content').innerHTML = vakogHtml;
+
+  // Antreiber
+  let antHtml = '';
+  const antNames = {perfekt:'Sei perfekt', beliebt:'Sei beliebt', stark:'Sei stark', streng:'Streng dich an', beeil:'Sei schnell', hut:'Sei auf der Hut', kannnicht:'Ich kann nicht'};
+  const scores = {};
+  Object.keys(antNames).forEach(k => {
+    const scoreEl = document.getElementById('score-' + k);
+    const score = scoreEl ? scoreEl.textContent : '0';
+    scores[k] = parseInt(score) || 0;
+    antHtml += '<div class="po-val"><span class="po-val-label">' + antNames[k] + '</span><span class="po-val-score">' + score + '</span></div>';
+  });
+  // Highlight max
+  const maxScore = Math.max(...Object.values(scores));
+  if (maxScore > 0) {
+    Object.keys(scores).forEach(k => {
+      if (scores[k] === maxScore) {
+        antHtml = antHtml.replace(
+          '<span class="po-val-label">' + antNames[k] + '</span>',
+          '<span class="po-val-label po-val-highlight">' + antNames[k] + '</span>'
+        );
+      }
+    });
+  }
+  document.getElementById('po-antreiber-content').innerHTML = antHtml;
+
+  // Förderliche Gedanken
+  let foerdHtml = '';
+  const foerdZusammenfassung = v('foerderliche_zusammenfassung');
+  if (foerdZusammenfassung) {
+    foerdHtml += '<div class="po-gedanke">' + foerdZusammenfassung + '</div>';
+  }
+  document.querySelectorAll('.förderlich-input').forEach((ta, i) => {
+    if (ta.value) foerdHtml += '<div class="po-gedanke">' + (i+1) + '. ' + ta.value + '</div>';
+  });
+  document.getElementById('po-foerderlich-content').innerHTML = foerdHtml || '-';
+
+  // Hinderliche Gedanken (Paare)
+  let hindHtml = '';
+  document.querySelectorAll('.thought-pair').forEach(pair => {
+    const hind = pair.querySelector('.hinderlich-input');
+    const umform = pair.querySelector('.umformulierung-input');
+    const hVal = hind ? hind.value : '';
+    const uVal = umform ? umform.value : '';
+    if (hVal || uVal) {
+      hindHtml += '<div class="po-pair"><span class="po-pair-left">' + (hVal||'-') + '</span><span class="po-pair-right">' + (uVal||'-') + '</span></div>';
+    }
+  });
+  document.getElementById('po-hinderlich-content').innerHTML = hindHtml || '-';
+
+  // Untere Zelle: nur die hinderlichen Gedanken (ohne Argumente/Umformulierung)
+  let hindOnlyHtml = '';
+  document.querySelectorAll('.thought-pair').forEach(pair => {
+    const hind = pair.querySelector('.hinderlich-input');
+    const hVal = hind ? hind.value : '';
+    if (hVal) hindOnlyHtml += '<div class="po-gedanke">' + hVal + '</div>';
+  });
+  document.getElementById('po-umstrukturierung-content').innerHTML = hindOnlyHtml || '-';
+
+  // Kreis der Gewohnheit
+  let gewHtml = '';
+  const gewText = v('gewohnheit_ziele') || '';
+  if (gewText) gewHtml += '<div>' + gewText + '</div>';
+  document.querySelectorAll('.gewohnheit-input').forEach(ta => {
+    if (ta.value) gewHtml += '<div class="po-gedanke">' + ta.value + '</div>';
+  });
+  document.getElementById('po-gewohnheit-content').innerHTML = gewHtml || '<div class="po-small">Bewegst du dich weiter in deinem Leben oder steckst du fest? Sind Gewohnheiten, Routine, Starre oder Stillstand in deinem Beruf, Partnerschaft?</div>';
+
+  // Erlebnis
+  const erlebnis = v('gewohnheit_erfahrung') || '';
+  document.getElementById('po-erlebnis-content').innerHTML = erlebnis || '<div class="po-small" style="font-style:italic; color:#13679A;">Ich fühlte mich mutig, lebendig. Ich habe etwas gemacht, dass ich sonst nicht mache. Es hat mir gefallen. Ich war spontan. Es war lustig. Es war cool.</div>';
+
+  // Coaching Anlass & Erwartungen (Seite 2)
+  let coachHtml = '';
+  const anlass = v('coaching_anlass');
+  const erwartungen = v('coaching_erwartungen');
+  if (anlass) coachHtml += '<div style="margin-bottom:4px;"><strong>Anlass:</strong> ' + anlass + '</div>';
+  if (erwartungen) coachHtml += '<div><strong>Erwartungen:</strong> ' + erwartungen + '</div>';
+  const coachEl = document.getElementById('po-coaching-content');
+  if (coachEl) coachEl.innerHTML = coachHtml || '-';
+
+  // Byron Katie - The Work (Seite 2)
+  let byronHtml = '';
+  const byronAussagen = [];
+  for (let i = 1; i <= 5; i++) {
+    const a = v('byron_aussage' + i);
+    if (a) byronAussagen.push(a);
+  }
+  if (byronAussagen.length) {
+    byronHtml += '<div style="margin-bottom:4px;"><strong>Glaubenssätze:</strong></div>';
+    byronAussagen.forEach((a, i) => {
+      byronHtml += '<div class="po-gedanke">' + (i+1) + '. ' + a + '</div>';
+    });
+  }
+  const fragenLabels = [
+    '1. Ist das wahr?',
+    '2. Kannst du mit absoluter Sicherheit wissen, dass das wahr ist?',
+    '3. Wie reagierst du, was passiert, wenn du diesen Gedanken glaubst?',
+    '4. Wer wärst du ohne diesen Gedanken?'
+  ];
+  let hasFragen = false;
+  for (let i = 1; i <= 4; i++) {
+    const f = v('byron_frage' + i);
+    if (f) { hasFragen = true; break; }
+  }
+  if (hasFragen) {
+    byronHtml += '<div style="margin-top:6px; margin-bottom:4px;"><strong>Die vier Fragen:</strong></div>';
+    byronHtml += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:4px;">';
+    for (let i = 1; i <= 4; i++) {
+      const f = v('byron_frage' + i);
+      byronHtml += '<div style="border:1px solid #ddd; padding:3px;"><div style="font-size:6pt; color:#003770; font-weight:bold;">' + fragenLabels[i-1] + '</div><div>' + (f || '-') + '</div></div>';
+    }
+    byronHtml += '</div>';
+  }
+  const umkSelbst = v('byron_umkehrung_selbst');
+  const umkAndere = v('byron_umkehrung_andere');
+  const umkGegenteil = v('byron_umkehrung_gegenteil');
+  if (umkSelbst || umkAndere || umkGegenteil) {
+    byronHtml += '<div style="margin-top:6px; margin-bottom:4px;"><strong>Umkehrungen:</strong></div>';
+    byronHtml += '<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px;">';
+    byronHtml += '<div style="border:1px solid #ddd; padding:3px;"><div style="font-size:6pt; color:#003770; font-weight:bold;">Zum Selbst</div><div>' + (umkSelbst || '-') + '</div></div>';
+    byronHtml += '<div style="border:1px solid #ddd; padding:3px;"><div style="font-size:6pt; color:#003770; font-weight:bold;">Zum Anderen</div><div>' + (umkAndere || '-') + '</div></div>';
+    byronHtml += '<div style="border:1px solid #ddd; padding:3px;"><div style="font-size:6pt; color:#003770; font-weight:bold;">Ins Gegenteil</div><div>' + (umkGegenteil || '-') + '</div></div>';
+    byronHtml += '</div>';
+  }
+  const byronEl = document.getElementById('po-byron-content');
+  if (byronEl) byronEl.innerHTML = byronHtml || '-';
+
+  window.print();
+}
+
+// ========================
+// XLSX Import
+// ========================
+function importXLSX(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'array' });
+      parseXLSX(wb);
+      alert('XLSX-Import erfolgreich abgeschlossen.');
+    } catch(err) {
+      alert('Fehler beim XLSX-Import: ' + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+  event.target.value = '';
+}
+
+function cellVal(sheet, addr) {
+  if (!sheet) return '';
+  const cell = sheet[addr];
+  return cell ? (cell.v !== undefined ? String(cell.v).trim() : '') : '';
+}
+
+function parseXLSX(wb) {
+  const sv = (id, val) => { const el = document.getElementById(id); if (el && val && val !== '0') el.value = val; };
+  const isData = v => v && v !== '0' && v !== 'NaN' && v !== 'Teammitglied';
+  const labelWords = ['Selbstverantwortung','Commitment','Du bist','Die einzige','Das Niederschreiben','Mein Ziel','definieren','Stärken:','Mein inneres Team','VAKO','Visuell','Auditiv','Kinest','Gustatorisch','Olfaktorisch','Antreiber','Sei perfekt','Sei beliebt','Sei stark','Streng Dich','Sei schnell','Sei auf','Ich kann nicht','Bewegst Du','Neue Erfahrungen','Beschreibe Dein','Mein Kreis','Auseinadersetzten','Argumente sammeln','Hinderliche Gedanken','Umstrukturierung','Seine Eigenschaften','Welche Fähigkeiten','Mein Krafttier','Name','(ich '];
+  const isLabel = v => labelWords.some(l => v.startsWith(l));
+
+  // === MP2rozess (Übersichtsblatt) ===
+  const mp = wb.Sheets['MP2rozess'];
+  if (mp) {
+    // Name aus Team-Zeile: "Mein inneres Team TEAM <Name>"
+    const teamTitle = cellVal(mp, 'B17');
+    if (teamTitle) { const m = teamTitle.match(/TEAM\s+(.+)/i); if (m) sv('klient_vorname', m[1].trim()); }
+
+    // Huna-Werte (ungerade Zeilen 3-15)
+    [['huna_ike','B3'],['huna_kala','B5'],['huna_makia','B7'],['huna_manawa','B9'],['huna_aloha','B11'],['huna_mana','B13'],['huna_pono','B15']].forEach(([id,addr]) => sv(id, cellVal(mp, addr)));
+
+    // Ziel aus Übersicht (E18)
+    sv('smart_zusammenfassung', cellVal(mp, 'E18'));
+
+    // Team aus Übersicht (B19-B26)
+    let teamNames = [];
+    for (let r = 19; r <= 26; r++) { const v = cellVal(mp, 'B' + r); if (isData(v) && !isLabel(v)) teamNames.push(v); }
+
+    // Krafttier aus Übersicht (F-Spalte)
+    let eigenArr = [];
+    for (let r = 4; r <= 15; r++) { const v = cellVal(mp, 'F' + r); if (isData(v) && !isLabel(v)) eigenArr.push(v); }
+    if (eigenArr.length) sv('krafttier_eigenschaften', eigenArr.join('\n'));
+
+    let faehArr = [];
+    for (let r = 5; r <= 15; r++) { const v = cellVal(mp, 'I' + r); if (isData(v) && !isLabel(v)) faehArr.push(v); }
+    if (faehArr.length) sv('krafttier_bereits', faehArr.join('\n'));
+
+    // Förderliche Gedanken Übersicht (E29-E33)
+    let foerdOv = [];
+    for (let r = 29; r <= 33; r++) { const v = cellVal(mp, 'E' + r); if (isData(v) && !isLabel(v)) foerdOv.push(v); }
+
+    // Hinderliche Gedanken Übersicht (F29-F31)
+    let hindOv = [];
+    for (let r = 29; r <= 31; r++) { const v = cellVal(mp, 'F' + r); if (isData(v) && !isLabel(v)) hindOv.push(v); }
+
+    // Argumente (F18, I18, F22, I22)
+    let argumente = [];
+    ['F18','I18','F22','I22'].forEach(addr => { const v = cellVal(mp, addr); if (isData(v) && v.length > 5 && !isLabel(v)) argumente.push(v); });
+
+    // Gewohnheit (F34)
+    const gewZiel = cellVal(mp, 'F34');
+    if (isData(gewZiel) && gewZiel.length > 5 && !isLabel(gewZiel)) sv('gewohnheit_ziele', gewZiel);
+
+    // Erlebnis (F38)
+    const erlebnis = cellVal(mp, 'F38');
+    if (isData(erlebnis) && erlebnis.length > 3) sv('gewohnheit_erfahrung', erlebnis);
+
+    // Setze förderliche aus Übersicht
+    if (foerdOv.length) {
+      const list = document.getElementById('förderliche-list');
+      if (list) { list.innerHTML = ''; foerdOv.forEach((t, i) => { const d = document.createElement('div'); d.className = 'list-item'; d.innerHTML = '<span style="min-width:24px;font-weight:700;color:var(--accent);padding-top:10px;">'+(i+1)+'.</span><textarea class="förderlich-input" rows="2">'+t+'</textarea><button class="btn-remove" onclick="removeListItem(this)">X</button>'; list.appendChild(d); }); }
+    }
+
+    // Setze hinderliche aus Übersicht
+    if (hindOv.length) {
+      const list = document.getElementById('hinderliche-list');
+      if (list) { list.innerHTML = ''; hindOv.forEach(h => { const u = argumente.length ? argumente.shift() : ''; const d = document.createElement('div'); d.className = 'thought-pair'; d.innerHTML = '<textarea class="hinderlich-input" rows="2">'+h+'</textarea><div class="arrow">&rarr;</div><textarea class="umformulierung-input" rows="2">'+u+'</textarea>'; list.appendChild(d); }); }
+    }
+
+    // Setze Team aus Übersicht
+    if (teamNames.length) {
+      const list = document.getElementById('team-list');
+      if (list) { list.innerHTML = ''; teamNames.forEach((n, i) => { const d = document.createElement('div'); d.className = 'list-item'; d.style.cssText = 'flex-direction:column;gap:8px;'; d.innerHTML = '<div style="display:flex;gap:10px;width:100%;align-items:center;"><span style="min-width:100px;font-weight:700;color:var(--accent);">Mitglied '+(i+1)+'</span><input type="text" class="team-name" value="'+n+'" style="flex:1;"><button class="btn-remove" onclick="this.closest(\'.list-item\').remove()">X</button></div><textarea class="team-desc" rows="2" style="width:100%;"></textarea>'; list.appendChild(d); }); }
+    }
+  }
+
+  // === Ziel (SMART) ===
+  const ziel = wb.Sheets['Ziel'];
+  if (ziel) {
+    const qWords = ['Spezifisch','Messbar','Woran erkennen','Attraktiv','Realisierbar','Terminiert','Erstrebenswert','MEIN ZIEL','möglichst genaue'];
+    const isQ = v => qWords.some(k => v.includes(k));
+
+    let smartS = []; for (let r = 6; r <= 8; r++) { const v = cellVal(ziel, 'B'+r); if (v && !isQ(v)) smartS.push(v); }
+    if (smartS.length) sv('smart_spezifisch', smartS.join('\n'));
+
+    let smartM = []; for (let r = 10; r <= 16; r++) { const v = cellVal(ziel, 'B'+r); if (v && !isQ(v)) smartM.push(v); }
+    if (smartM.length) sv('smart_messbar', smartM.join('\n'));
+
+    let smartA = []; for (let r = 18; r <= 20; r++) { const v = cellVal(ziel, 'B'+r); if (v && !isQ(v)) smartA.push(v); }
+    if (smartA.length) sv('smart_attraktiv', smartA.join('\n'));
+
+    let smartR = []; for (let r = 22; r <= 24; r++) { const v = cellVal(ziel, 'B'+r); if (v && !isQ(v)) smartR.push(v); }
+    if (smartR.length) sv('smart_realistisch', smartR.join('\n'));
+
+    let smartT = []; for (let r = 26; r <= 28; r++) { const v = cellVal(ziel, 'B'+r); if (v && !isQ(v)) smartT.push(v); }
+    if (smartT.length) sv('smart_zeitgebunden', smartT.join('\n'));
+
+    const zusammen = cellVal(ziel, 'B35') || cellVal(ziel, 'B34');
+    if (zusammen && zusammen !== 'MEIN ZIEL LAUTET DEMNACH') sv('smart_zusammenfassung', zusammen);
+  }
+
+  // === VAKOG ===
+  const vakog = wb.Sheets['VAKOG'];
+  if (vakog) {
+    const sinneCol = ['C','D','E','F','G'];
+    const sinneKey = ['v','a','k','g','o'];
+    for (let i = 0; i < 18; i++) {
+      const row = 22 + i;
+      sinneCol.forEach((col, si) => {
+        const v = cellVal(vakog, col + row);
+        const cb = document.getElementById('vakog_' + i + '_' + sinneKey[si]);
+        if (cb) cb.checked = (v === '1' || v === 'x' || v === 'X' || v === 'TRUE');
+      });
+    }
+    if (typeof updateVAKOG === 'function') updateVAKOG();
+  }
+
+  // === Antreibertest ===
+  const ant = wb.Sheets['Antreibertest '] || wb.Sheets['Antreibertest'];
+  if (ant) {
+    for (let q = 0; q < 35; q++) {
+      const excelRow = 3 + (q * 2);
+      const colG = cellVal(ant, 'G' + excelRow);
+      if (colG !== '') {
+        const val = parseInt(colG);
+        if (!isNaN(val) && val >= 0 && val <= 2) {
+          const radio = document.querySelector('input[name="antreiber_'+q+'"][value="'+val+'"]');
+          if (radio) radio.checked = true;
+        }
+      }
+    }
+    if (typeof calcAntreiber === 'function') calcAntreiber();
+  }
+
+  // === Förderliche Gedanken (Detail) ===
+  const foerd = wb.Sheets['förderliche Gedanken'];
+  if (foerd) {
+    let items = [];
+    for (let r = 39; r <= 43; r++) { const v = cellVal(foerd, 'B'+r); if (v) items.push(v); }
+    if (items.length) {
+      const list = document.getElementById('förderliche-list');
+      if (list) { list.innerHTML = ''; items.forEach((t, i) => { const d = document.createElement('div'); d.className = 'list-item'; d.innerHTML = '<span style="min-width:24px;font-weight:700;color:var(--accent);padding-top:10px;">'+(i+1)+'.</span><textarea class="förderlich-input" rows="2">'+t+'</textarea><button class="btn-remove" onclick="removeListItem(this)">X</button>'; list.appendChild(d); }); }
+    }
+  }
+
+  // === Hinderliche Gedanken (Detail) ===
+  const hind = wb.Sheets['hinderliche Gedanken'];
+  if (hind) {
+    let items = [];
+    for (let r = 33; r <= 37; r++) {
+      const v = cellVal(hind, 'C'+r);
+      if (isData(v) && v !== 'Umformulierung zu förderlichen Gedanken') items.push({ hinderlich: v, umformulierung: '' });
+    }
+    const aendern = wb.Sheets['ändern hinderliche Gedanken'];
+    if (aendern) {
+      let idx = 0;
+      for (let r = 51; r <= 54; r++) { const v = cellVal(aendern, 'C'+r); if (v && items[idx]) { items[idx].umformulierung = v; idx++; } }
+    }
+    if (items.length) {
+      const list = document.getElementById('hinderliche-list');
+      if (list) { list.innerHTML = ''; items.forEach(p => { const d = document.createElement('div'); d.className = 'thought-pair'; d.innerHTML = '<textarea class="hinderlich-input" rows="2">'+p.hinderlich+'</textarea><div class="arrow">&rarr;</div><textarea class="umformulierung-input" rows="2">'+p.umformulierung+'</textarea>'; list.appendChild(d); }); }
+    }
+  }
+
+  // === Mein Krafttier (Detail) ===
+  const kraft = wb.Sheets['Mein Krafttier'];
+  if (kraft) {
+    const instrK = ['Wenn Du ein Tier','Interviewe','o Wie','o Was','Welche diese','Welche Fähigkeiten','http'];
+    const isInstr = v => instrK.some(k => v.startsWith(k));
+
+    for (let r = 3; r <= 16; r++) { const v = cellVal(kraft, 'B'+r); if (v && !isInstr(v)) { sv('krafttier_name', v); break; } }
+
+    let bereits = [];
+    for (let r = 19; r <= 24; r++) { const v = cellVal(kraft, 'B'+r); if (v && !isInstr(v)) bereits.push(v); }
+    if (bereits.length) sv('krafttier_bereits', bereits.join('\n'));
+
+    let aneignen = [];
+    for (let r = 27; r <= 50; r++) { const v = cellVal(kraft, 'B'+r); if (v && !isInstr(v)) aneignen.push(v); }
+    if (aneignen.length) sv('krafttier_aneignen', aneignen.join('\n'));
+  }
+
+  // === Mein inneres Team (Detail, überschreibt Übersicht) ===
+  const team = wb.Sheets['Mein inneres Team'];
+  if (team) {
+    let members = [];
+    for (let r = 31; r <= 39; r++) { const desc = cellVal(team, 'B'+r); if (desc) members.push(desc); }
+    if (members.length) {
+      const list = document.getElementById('team-list');
+      if (list) { list.innerHTML = ''; members.forEach((n, i) => { const d = document.createElement('div'); d.className = 'list-item'; d.style.cssText = 'flex-direction:column;gap:8px;'; d.innerHTML = '<div style="display:flex;gap:10px;width:100%;align-items:center;"><span style="min-width:100px;font-weight:700;color:var(--accent);">Mitglied '+(i+1)+'</span><input type="text" class="team-name" value="'+n+'" style="flex:1;"><button class="btn-remove" onclick="this.closest(\'.list-item\').remove()">X</button></div><textarea class="team-desc" rows="2" style="width:100%;"></textarea>'; list.appendChild(d); }); }
+    }
+  }
+
+  // === Byron Katie ===
+  const byron = wb.Sheets['Methode nach Byron Katie'];
+  if (byron) {
+    const bK = ['Ich bin (Gefühl)','Ich will, dass','(Name) sollte','Ich brauche es','Ich will nie wieder','Denke an','Wer oder was','In dieser Situation','Was genau sollte','Brauchst du','Was ist es','Die Überprüfung','4 Fragen','Ist das wahr','Kannst du absolut','Wie reagierst','Wer währst','kehre deine','und','schliesse'];
+    const isBL = v => bK.some(k => v.startsWith(k)) || /^\d+$/.test(v);
+
+    [[8,10,'byron_aussage1'],[15,17,'byron_aussage2'],[22,24,'byron_aussage3'],[29,31,'byron_aussage4'],[36,38,'byron_aussage5']].forEach(([from,to,id]) => {
+      for (let r = from; r <= to; r++) { const v = cellVal(byron, 'B'+r); if (v && !isBL(v)) { sv(id, v); break; } }
+    });
+  }
+
+  // === Kreis der Gewohnheit ===
+  const gew = wb.Sheets['Kreis der Gewohnheit'];
+  if (gew) {
+    const erlebnis = cellVal(gew, 'B48');
+    if (erlebnis && erlebnis.length > 3) sv('gewohnheit_erfahrung', erlebnis);
+  }
+}
+</script>
+
+</body>
+</html>
